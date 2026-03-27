@@ -109,6 +109,23 @@ export default function (pi: ExtensionAPI) {
 
   const canSend = typeof pi.sendUserMessage === "function";
 
+  // helper to send messages safely using streamingBehavior 'followUp'
+  // Named explicitly to align with extension skill conventions.
+  const sendUserMessageSafe = async (text: string) => {
+    if (!canSend) return;
+    try {
+      // prefer followUp to avoid interrupting agent processing
+      await pi.sendUserMessage?.(text, { streamingBehavior: 'followUp' } as any);
+    } catch (e) {
+      try {
+        // retry once without options
+        await pi.sendUserMessage?.(text as any);
+      } catch (_) {
+        // ignore failures to avoid breaking flows
+      }
+    }
+  };
+
   // Registrar comando /log_diario
   try {
     // registerCommand using examples' handler signature
@@ -119,20 +136,20 @@ export default function (pi: ExtensionAPI) {
         let noteBody = (args && String(args).trim()) || (ctx?.input && String(ctx.input).trim()) || "";
 
         if (!noteBody) {
-          await pi.sendUserMessage?.("Por favor pega aquí la nota que quieres convertir en registros Mulch. Luego ejecuta /log_diario de nuevo sin argumentos.");
+          await sendUserMessageSafe("Por favor pega aquí la nota que quieres convertir en registros Mulch. Luego ejecuta /log_diario de nuevo sin argumentos.");
           return;
         }
 
         // Split note into atomic proposals
         const proposals = splitIntoProposals(noteBody);
         if(!proposals || proposals.length===0){
-          await pi.sendUserMessage?.("No pude extraer propuestas de la nota. Asegúrate de incluir acciones o frases como 'para ...:' en líneas separadas.");
+          await sendUserMessageSafe("No pude extraer propuestas de la nota. Asegúrate de incluir acciones o frases como 'para ...:' en líneas separadas.");
           return;
         }
 
         const previews: string[] = [];
         const parsedList: any[] = [];
-        await pi.sendUserMessage?.(`He detectado ${proposals.length} propuesta(s). Analizando cada una...`);
+        await sendUserMessageSafe(`He detectado ${proposals.length} propuesta(s). Analizando cada una...`);
 
         for(const p of proposals){
           // resolve dates and related hints for the fragment
@@ -147,7 +164,7 @@ export default function (pi: ExtensionAPI) {
             .replace("{{NOTE_DATE}}", noteDateResolved || '')
             .replace("{{RELATED_HINTS}}", '');
 
-          if (!canSend) { await pi.sendUserMessage?.("La API de mensajería no está disponible en este entorno."); return; }
+          if (!canSend) { await sendUserMessageSafe("La API de mensajería no está disponible en este entorno."); return; }
           try{
             const response = await pi.sendMessage?.({ role: "user", content: prompt } as any);
             const text = Array.isArray(response?.content)
@@ -174,23 +191,23 @@ export default function (pi: ExtensionAPI) {
             previews.push(preview);
             parsedList.push(parsed);
           } catch(err){
-            await pi.sendUserMessage?.('Error al procesar una propuesta: '+String(err));
+            await sendUserMessageSafe('Error al procesar una propuesta: '+String(err));
           }
         }
 
         // show combined preview and ask for confirmation per-proposal or all
         const combined = previews.map((p,i)=>`--- Propuesta ${i+1} ---\n${p}`).join("\n\n");
-        await pi.sendUserMessage?.("Propuestas de registros Mulch:\n" + combined + "\n\nResponde 'sí' para crear todas, 'parcial N,M' para crear índices (ej: 'parcial 1,3'), 'no' para cancelar, o 'preview' para recibir los comandos sin ejecutar.");
+        await sendUserMessageSafe("Propuestas de registros Mulch:\n" + combined + "\n\nResponde 'sí' para crear todas, 'parcial N,M' para crear índices (ej: 'parcial 1,3'), 'no' para cancelar, o 'preview' para recibir los comandos sin ejecutar.");
 
         const sessionId = (ctx.session && (ctx.session.id || ctx.session.sessionId)) || String(Date.now());
         pending.set(sessionId, { parsed: parsedList, ts: Date.now() });
 
-        await pi.sendUserMessage?.("He guardado las propuestas. Responde según lo indicado. Esta propuesta expira en 30 minutos.");
+        await sendUserMessageSafe("He guardado las propuestas. Responde según lo indicado. Esta propuesta expira en 30 minutos.");
 
       }
     });
   } catch (err) {
-    pi.sendUserMessage?.("No se pudo registrar el comando /log_diario: " + String(err));
+    await sendUserMessageSafe("No se pudo registrar el comando /log_diario: " + String(err));
   }
 
   // No longer needed: /log_diario_confirm command. Confirmation handled via input listener below.
@@ -203,7 +220,7 @@ export default function (pi: ExtensionAPI) {
       handler: async (args: string, ctx: any) => {
         const cmd = (args && String(args).trim()) || (ctx?.input && String(ctx.input).trim()) || "";
         if (!cmd) {
-          await pi.sendUserMessage?.("Uso: /log_diario_run <ml_command>");
+          await sendUserMessageSafe("Uso: /log_diario_run <ml_command>");
           return;
         }
 
@@ -221,22 +238,22 @@ export default function (pi: ExtensionAPI) {
           const code: number = await new Promise((res) => proc.on('close', res as any));
 
           if (code === 0) {
-            await pi.sendUserMessage?.('ml record ejecutado correctamente. stdout:\n' + stdout);
+            await sendUserMessageSafe('ml record ejecutado correctamente. stdout:\n' + stdout);
             // Opcional: validar y sync
             // spawn('ml', ['validate']); spawn('ml', ['sync']);
             return;
           } else {
-            await pi.sendUserMessage?.('Error ejecutando ml record. stderr:\n' + stderr);
+            await sendUserMessageSafe('Error ejecutando ml record. stderr:\n' + stderr);
             return;
           }
         } catch (err) {
-          await pi.sendUserMessage?.('Excepción al ejecutar el comando: ' + String(err));
+          await sendUserMessageSafe('Excepción al ejecutar el comando: ' + String(err));
           return;
         }
       }
     });
   } catch (e) {
-    pi.sendUserMessage?.("No se pudo registrar /log_diario_run: " + String(e));
+    await sendUserMessageSafe("No se pudo registrar /log_diario_run: " + String(e));
   }
 
   // Register a tool as well for programmatic use
@@ -451,23 +468,23 @@ export default function (pi: ExtensionAPI) {
         if (!pending.has(sessionId)) return;
         const entry = pending.get(sessionId)!;
         // expire after configured expiration
-        if (Date.now() - entry.ts > DEFAULT_EXPIRATION_MS) { pending.delete(sessionId); await pi.sendUserMessage?.('La propuesta ha expirado.'); return; }
+        if (Date.now() - entry.ts > DEFAULT_EXPIRATION_MS) { pending.delete(sessionId); await sendUserMessageSafe('La propuesta ha expirado.'); return; }
 
         // Normalize commands: confirm all, confirm 1,2, preview, edit N, cancel
         if (text === 'confirm all') {
           const list = Array.isArray(entry.parsed) ? entry.parsed : [entry.parsed];
-          await pi.sendUserMessage?.('Ejecutando todos los comandos ml (uno por propuesta)...');
+          await sendUserMessageSafe('Ejecutando todos los comandos ml (uno por propuesta)...');
           for(const item of list){
             const cmdObj = item._cmdObj || { cmd: item.ml_command };
-            if(!cmdObj || !cmdObj.cmd){ await pi.sendUserMessage?.('Falta ml_command en una propuesta, omitiendo.'); continue; }
-            await pi.sendUserMessage?.('Ejecutando: '+cmdObj.cmd);
+            if(!cmdObj || !cmdObj.cmd){ await sendUserMessageSafe('Falta ml_command en una propuesta, omitiendo.'); continue; }
+            await sendUserMessageSafe('Ejecutando: '+cmdObj.cmd);
             try{
               const proc = Array.isArray(cmdObj.argv) && cmdObj.argv.length>0 ? spawn(cmdObj.argv[0], cmdObj.argv.slice(1), { stdio: 'pipe' }) : spawn(String(cmdObj.cmd).split(/\s+/)[0], String(cmdObj.cmd).split(/\s+/).slice(1), { stdio: 'pipe' });
               let stdout=''; let stderr='';
               proc.stdout.on('data', d=>{ stdout+=String(d); }); proc.stderr.on('data', d=>{ stderr+=String(d); });
               const code: number = await new Promise((res)=> proc.on('close', res as any));
-              if(code===0){ await pi.sendUserMessage?.('Registro creado correctamente. stdout:\n'+stdout); }
-              else { await pi.sendUserMessage?.('Error creando registro. stderr:\n'+stderr); }
+              if(code===0){ await sendUserMessageSafe('Registro creado correctamente. stdout:\n'+stdout); }
+              else { await sendUserMessageSafe('Error creando registro. stderr:\n'+stderr); }
             } catch(err){ await pi.sendUserMessage?.('Excepción al ejecutar ml: '+String(err)); }
           }
           if(AUTO_VALIDATE_AND_SYNC){ try{ await pi.sendUserMessage?.('Ejecutando ml validate y ml sync...'); spawn('ml',['validate']); spawn('ml',['sync']); }catch{} }
