@@ -437,33 +437,6 @@ export default function (pi: ExtensionAPI) {
     // ignore
   }
 
-  // Tool call gate: require ml prime to be executed before arbitrary tool calls (pattern extracted from reference)
-  try {
-    let primeRan = false; // flips to true when we execute runMl(['prime']) in this extension
-
-    // Mark primeRan when we call ml prime inside the tool (we already call it there)
-    // We'll set it in the execute function when prime is run.
-
-    pi.on?.('tool_call', async (event: any) => {
-      // allow internal log_diario tool calls
-      if (!event || !event.toolName) return { block: false };
-      if (event.toolName === 'log_diario_collect') return { block: false };
-
-      if (event.toolName === 'log_diario') {
-        // use extension-local flag only
-        const primeFlag = primeRan;
-        if (!primeFlag) {
-          return {
-            block: true,
-            reason: "🚨 Antes de usar herramientas externas debes ejecutar 'ml prime' para cargar el contexto Mulch. Indica 'tool_call: ml prime' en tu respuesta o ejecuta `ml prime` y reintenta. No invoques herramientas directamente desde la respuesta del modelo.",
-          };
-        }
-      }
-      return { block: false };
-    });
-  } catch (e) {
-    // ignore
-  }
 
   // Listen for user input to confirm/cancel pending proposals
   try {
