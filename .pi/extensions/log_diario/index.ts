@@ -419,6 +419,11 @@ export default function (pi: ExtensionAPI) {
             parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
           }
 
+          // Defensive: if parsedArray only contains 'thinking' artifacts, replace with fallback
+          if(parsedArray.length>0 && parsedArray.every((it:any)=> it && it.type === 'thinking')){
+            parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
+          }
+
           // Return only the parsed JSON array
           return { content: [{ type: 'text', text: JSON.stringify(parsedArray) }] };
         }catch(e){
