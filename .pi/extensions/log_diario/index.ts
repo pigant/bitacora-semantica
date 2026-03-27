@@ -2,7 +2,7 @@ import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-age
 import { Type } from "@sinclair/typebox";
 
 const COLLECTOR_PROMPT = `
-# NOTA IMPORTANTE PARA EL MODELO: Si tu respuesta requiere invocar herramientas externas (p.ej. `ml learn`, `ml record`, etc.), NO ejecutes ni llames esas herramientas directamente. Primero debes solicitar explícitamente la ejecución de `ml prime` (por ejemplo indicando `tool_call: ml prime`) y esperar a que la extensión ejecute `ml prime` y le pase su contexto. Solo después de eso se podrán proponer comandos para ejecutar. Nunca llames herramientas desde la respuesta del modelo.
+# NOTA IMPORTANTE PARA EL MODELO: Si tu respuesta requiere invocar herramientas externas (p.ej. 'ml learn', 'ml record', etc.), NO ejecutes ni llames esas herramientas directamente. Primero debes solicitar explícitamente la ejecución de 'ml prime' (por ejemplo indicando 'tool_call: ml prime') y esperar a que la extensión ejecute 'ml prime' y le pase su contexto. Solo después de eso se podrán proponer comandos para ejecutar. Nunca llames herramientas desde la respuesta del modelo.
 
 Eres un recolector de conocimiento para Mulch. Recibirás una nota diaria y contexto corto extraído de la base Mulch (ml prime / ml status). Para cada hecho relevante en la nota debes generar UN OBJETO JSON. Devuelve SOLO UN ARRAY JSON ([], sin texto adicional ni explicaciones).
 
