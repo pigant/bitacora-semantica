@@ -256,8 +256,7 @@ export default function (pi: ExtensionAPI) {
         const statusRes = runMl(['status']);
         const statusOut = statusRes.stdout + (statusRes.error? '\n[ml status error] '+String(statusRes.error): '');
         // mark that prime has been executed in this extension (for tool_call gate)
-        try{ (pi as any).__log_diario_prime_ran = true; }catch{};
-        try{ (globalThis as any).__log_diario_prime_ran = true; }catch{};
+        try{ primeRan = true; }catch{};
 
         const explicitDate = extractDateFromNote(noteBody);
         const rel = detectRelativeDate(noteBody, primeDate || undefined);
@@ -445,15 +444,16 @@ export default function (pi: ExtensionAPI) {
       if (!event || !event.toolName) return { block: false };
       if (event.toolName === 'log_diario_collect') return { block: false };
 
-      // consider global flags (in case prime was run elsewhere)
-      const primeFlag = ((pi as any).__log_diario_prime_ran) || ((globalThis as any).__log_diario_prime_ran) || primeRan;
-      if (!primeFlag) {
-        return {
-          block: true,
-          reason: "🚨 Antes de usar herramientas externas debes ejecutar 'ml prime' para cargar el contexto Mulch. Indica 'tool_call: ml prime' en tu respuesta o ejecuta `ml prime` y reintenta. No invoques herramientas directamente desde la respuesta del modelo.",
-        };
+      if (event.toolName === 'log_diario') {
+        // use extension-local flag only
+        const primeFlag = primeRan;
+        if (!primeFlag) {
+          return {
+            block: true,
+            reason: "🚨 Antes de usar herramientas externas debes ejecutar 'ml prime' para cargar el contexto Mulch. Indica 'tool_call: ml prime' en tu respuesta o ejecuta `ml prime` y reintenta. No invoques herramientas directamente desde la respuesta del modelo.",
+          };
+        }
       }
-
       return { block: false };
     });
   } catch (e) {
