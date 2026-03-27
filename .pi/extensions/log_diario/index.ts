@@ -37,7 +37,9 @@ Nota del usuario:
 """{{NOTE_BODY}}"""
 `;
 
-import { safeJsonParse, writeTempSession, cleanupTemp, resolveThinking, extractDateFromNote, extractDateFromPrime, detectRelativeDate, findRelatedEvents, normalizeDateIso } from './helpers.ts';
+import { safeJsonParse, writeTempSession, cleanupTemp, resolveThinking, extractDateFromNote, extractDateFromPrime, detectRelativeDate, findRelatedEvents, normalizeDateIso, inferDomain as h_inferDomain, splitIntoProposals as h_splitIntoProposals, buildMlCommand as h_buildMlCommand } from './helpers.ts';
+import { extractAssistantTextFromPiOutput, parseAssistantTextToArray, normalizeParsedArray } from './parser.ts';
+import { buildCollectorPrompt } from './prompt.ts';
 import { runPiCli, runMl } from './cli.ts';
 import { spawn } from 'child_process';
 
@@ -52,7 +54,7 @@ export default function (pi: ExtensionAPI) {
     operaciones: ['instalación','apoyo','soporte','operaciones','deploy']
   };
 
-  function inferDomain(text: string): string {
+  function h_inferDomain(text: string): string {
     const t = text.toLowerCase();
     for(const d of Object.keys(DOMAIN_KEYWORDS)){
       for(const kw of DOMAIN_KEYWORDS[d]) if(t.includes(kw)) return d;
@@ -60,7 +62,7 @@ export default function (pi: ExtensionAPI) {
     return 'general';
   }
 
-  function splitIntoProposals(note: string): string[] {
+  function h_splitIntoProposals(note: string): string[] {
     // Split by lines that start with common markers (para , - , •) or by sentences if short
     const lines = note.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
     const proposals: string[] = [];
@@ -77,9 +79,9 @@ export default function (pi: ExtensionAPI) {
     return proposals;
   }
 
-  async function buildMlCommand(parsed: any): Promise<string> {
+  async function h_buildMlCommand(parsed: any): Promise<string> {
     // Ensure domain is valid
-    const domain = String(parsed.domain || inferDomain(parsed.description || parsed.title || ''))
+    const domain = String(parsed.domain || h_inferDomain(parsed.description || parsed.title || ''))
       .toLowerCase().replace(/[^a-z0-9-]/g,'') || 'general';
     // Map types to allowed mulch types and required flags
     const typeMap: Record<string,string> = {
@@ -141,7 +143,7 @@ export default function (pi: ExtensionAPI) {
         }
 
         // Split note into atomic proposals
-        const proposals = splitIntoProposals(noteBody);
+        const proposals = h_splitIntoProposals(noteBody);
         if(!proposals || proposals.length===0){
           await sendUserMessageSafe("No pude extraer propuestas de la nota. Asegúrate de incluir acciones o frases como 'para ...:' en líneas separadas.");
           return;
@@ -159,10 +161,7 @@ export default function (pi: ExtensionAPI) {
           const noteDateResolved = explicitDate || rel.iso || '';
           const relatedHints = [] as any[]; // no prime in this flow; keep empty
 
-          const prompt = COLLECTOR_PROMPT
-            .replace("{{NOTE_BODY}}", p.replace(/"/g, '\\"'))
-            .replace("{{NOTE_DATE}}", noteDateResolved || '')
-            .replace("{{RELATED_HINTS}}", '');
+          const prompt = buildCollectorPrompt(COLLECTOR_PROMPT, p, noteDateResolved, '');
 
           if (!canSend) { await sendUserMessageSafe("La API de mensajería no está disponible en este entorno."); return; }
           try{
@@ -171,21 +170,18 @@ export default function (pi: ExtensionAPI) {
               ? response.content.map((c: any) => c.text || "").join("\n")
               : response?.content?.text || String(response);
 
-            let parsed: any = null;
-            try { parsed = JSON.parse(text); } catch (e) {
-              const match = text.match(/\{[\s\S]*\}/);
-              if (match) { try { parsed = JSON.parse(match[0]); } catch {} }
-            }
+            const parsedGuess = (()=>{ try{ return JSON.parse(text); }catch(e){} const match = text.match(/\{[\s\S]*\}/); if(match){ try{ return JSON.parse(match[0]); }catch(e){} } return null; })();
+            let parsed: any = parsedGuess;
             if(!parsed){
               // fallback: minimal parsing
-              parsed = { date: noteDateResolved || '', domain: inferDomain(p), title: p.split(/[\.,;\-\(\)]+/)[0].slice(0,80), description: p, participants: 'desconocido', files: '' , type: 'reference' };
+              parsed = { date: noteDateResolved || '', domain: h_inferDomain(p), title: p.split(/[\.,;\-\(\)]+/)[0].slice(0,80), description: p, participants: 'desconocido', files: '' , type: 'reference' };
             }
             // ensure domain and files and ml_command
-            parsed.domain = parsed.domain || inferDomain(p);
+            parsed.domain = parsed.domain || h_inferDomain(p);
             parsed.files = parsed.files || '';
             parsed.date = parsed.date || noteDateResolved || '';
             parsed.related = parsed.related || [];
-            parsed.ml_command = await buildMlCommand(parsed);
+            parsed.ml_command = await h_buildMlCommand(parsed);
 
             const preview = `Dominio: ${parsed.domain}\nTitulo: ${parsed.title}\nFecha: ${parsed.date || ''}\nTipo: ${parsed.type || ''}\nParticipantes: ${parsed.participants || ''}\nArchivos: ${parsed.files || ''}\n\nDescripcion:\n${parsed.description || ''}\n\nComando ml propuesto:\n${parsed.ml_command}`;
             previews.push(preview);
@@ -406,17 +402,17 @@ export default function (pi: ExtensionAPI) {
 
           // Final fallback: build a single reference record
           if(parsedArray.length===0){
-            parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
+            parsedArray = [{ date: noteDateResolved || '', domain: h_inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
           }
 
           // Enrich each parsed item with defaults and relations
           for(const item of parsedArray){
             try{
               item.date = item.date || noteDateResolved || '';
-              item.domain = (item.domain || inferDomain(item.description || item.title || noteBody || '')).toLowerCase().replace(/[^a-z0-9-]/g,'') || 'general';
+              item.domain = (item.domain || h_inferDomain(item.description || item.title || noteBody || '')).toLowerCase().replace(/[^a-z0-9-]/g,'') || 'general';
               item.files = item.files || '';
               item.related = item.related || relatedHintsList || [];
-              item.ml_command = item.ml_command || await buildMlCommand(item);
+              item.ml_command = item.ml_command || await h_buildMlCommand(item);
             }catch(e){ /* ignore per-item */ }
           }
 
@@ -430,12 +426,12 @@ export default function (pi: ExtensionAPI) {
 
           // If after filtering nothing remains, fallback to single reference record
           if(parsedArray.length===0){
-            parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
+            parsedArray = [{ date: noteDateResolved || '', domain: h_inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
           }
 
           // Defensive: if parsedArray only contains 'thinking' artifacts, replace with fallback
           if(parsedArray.length>0 && parsedArray.every((it:any)=> it && it.type === 'thinking')){
-            parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
+            parsedArray = [{ date: noteDateResolved || '', domain: h_inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
           }
 
           // Return only the parsed JSON array
@@ -525,7 +521,7 @@ export default function (pi: ExtensionAPI) {
           try{ patch = JSON.parse(next); }catch(e){ await pi.sendUserMessage?.('JSON inválido. Cancelando.'); return; }
           Object.assign(item, patch);
           // rebuild ml_command
-          item.ml_command = await buildMlCommand(item);
+          item.ml_command = await h_buildMlCommand(item);
           item._cmdObj = { cmd: item.ml_command, argv: Array.isArray(item.ml_command)? item.ml_command : undefined };
           await pi.sendUserMessage?.('Propuesta actualizada. Nuevo comando:\n'+item.ml_command);
           return;

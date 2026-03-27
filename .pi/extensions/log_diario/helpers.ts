@@ -184,3 +184,55 @@ export function findRelatedEvents(note: string, primeText: string, statusText: s
   for(const r of out) uniq.set((r.id||r.title||'')+ '|' + r.reason, r);
   return Array.from(uniq.values()).slice(0,10);
 }
+
+// --- Additional helpers extracted from index.ts ---
+
+const DOMAIN_KEYWORDS: Record<string,string[]> = {
+  reportes: ['metabase','reporte','reportes','kiosco','report'],
+  kiosco: ['kiosco','kiosk','instalacion','instalación','kioskos'],
+  operaciones: ['instalación','apoyo','soporte','operaciones','deploy']
+};
+
+export function inferDomain(text: string): string {
+  const t = (text||'').toLowerCase();
+  for(const d of Object.keys(DOMAIN_KEYWORDS)){
+    for(const kw of DOMAIN_KEYWORDS[d]) if(t.includes(kw)) return d;
+  }
+  return 'general';
+}
+
+export function splitIntoProposals(note: string): string[] {
+  const lines = String(note||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const proposals: string[] = [];
+  for(const l of lines){
+    const m = l.match(/^(?:para\s+[^:]+:)?\s*(.+)$/i);
+    if(m) proposals.push(m[1]);
+  }
+  if(proposals.length===1){
+    const parts = proposals[0].split(/[;\.]\s+/).map(p=>p.trim()).filter(Boolean);
+    if(parts.length>1) return parts;
+  }
+  return proposals;
+}
+
+export async function buildMlCommand(parsed: any): Promise<string> {
+  const domain = String(parsed.domain || inferDomain(parsed.description || parsed.title || '')).toLowerCase().replace(/[^a-z0-9-]/g,'') || 'general';
+  const typeMap: Record<string,string> = { meeting: 'meeting', decision: 'decision', tradeoff:'tradeoff', incident:'failure', reference:'reference', guide:'guide', failure:'failure' };
+  const mlType = typeMap[parsed.type] || 'reference';
+  const title = (parsed.title || '').replace(/"/g,'\"') || ('Registro ' + Date.now());
+  const description = (parsed.description || '').replace(/"/g,'\"');
+  const files = (parsed.files || '').replace(/"/g,'\"');
+
+  let parts = ['ml','record', domain, '--type', mlType];
+  if(mlType==='decision'){
+    const rationale = (parsed.rationale || parsed.rationale_text || (parsed.description||'').split(/\.|,|;/)[0] || 'Decisión tomada').replace(/"/g,'\"');
+    parts.push('--title', title, '--rationale', rationale, '--description', description, '--files', files);
+  } else if(mlType==='failure'){
+    const resolution = (parsed.resolution || parsed.resolution_text || '').replace(/"/g,'\"') || 'Por resolver';
+    parts.push('--name', title, '--description', description, '--resolution', resolution, '--files', files);
+  } else {
+    parts.push('--name', title, '--description', description, '--files', files);
+  }
+
+  return parts.map(p=>/\s/.test(p)?`"${String(p).replace(/"/g,'\\"') }"`:p).join(' ');
+}
