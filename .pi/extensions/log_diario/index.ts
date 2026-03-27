@@ -255,9 +255,6 @@ export default function (pi: ExtensionAPI) {
         const primeDate = extractDateFromPrime(primeOut);
         const statusRes = runMl(['status']);
         const statusOut = statusRes.stdout + (statusRes.error? '\n[ml status error] '+String(statusRes.error): '');
-        // mark that prime has been executed in this extension (for tool_call gate)
-        try{ primeRan = true; }catch{};
-
         const explicitDate = extractDateFromNote(noteBody);
         const rel = detectRelativeDate(noteBody, primeDate || undefined);
         // priority: explicit > relative resolved with prime > primeDate > ''
