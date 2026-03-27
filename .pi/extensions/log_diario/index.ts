@@ -407,6 +407,19 @@ export default function (pi: ExtensionAPI) {
             }catch(e){ /* ignore per-item */ }
           }
 
+          // Filter out any streaming/debugging 'thinking' objects or items lacking useful fields
+          parsedArray = parsedArray.filter((it:any)=>{
+            if(!it || typeof it !== 'object') return false;
+            if(it.type === 'thinking') return false;
+            if(!it.title && !it.description && !it.domain) return false;
+            return true;
+          });
+
+          // If after filtering nothing remains, fallback to single reference record
+          if(parsedArray.length===0){
+            parsedArray = [{ date: noteDateResolved || '', domain: inferDomain(noteBody), title: (noteBody||'').split(/\n|\.|;|,|:/)[0].slice(0,80), description: noteBody, participants: 'desconocido', files: '', type: 'reference' }];
+          }
+
           // Return only the parsed JSON array
           return { content: [{ type: 'text', text: JSON.stringify(parsedArray) }] };
         }catch(e){
