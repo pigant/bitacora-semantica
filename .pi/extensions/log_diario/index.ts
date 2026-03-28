@@ -44,13 +44,10 @@ import { buildCollectorPrompt } from './prompt.ts';
 import { runPiCli, runMl } from './cli.ts';
 import { spawn } from 'child_process';
 
-// register optional wizard tool if present
-try{
-  const wizard = await import('./wizard.ts');
-  if(typeof wizard.default === 'function') wizard.default((pi as any));
-}catch(e){ /* ignore: wizard not available in some environments */ }
 
+// Note: wizard moved to separate extension log_diario_wizard
 }
+
 
 export default function (pi: ExtensionAPI) {
   // In-memory pending proposals per sessionId
