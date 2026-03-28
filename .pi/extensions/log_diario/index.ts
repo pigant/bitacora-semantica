@@ -37,11 +37,20 @@ Nota del usuario:
 """{{NOTE_BODY}}"""
 `;
 
-import { safeJsonParse, writeTempSession, cleanupTemp, resolveThinking, extractDateFromNote, extractDateFromPrime, detectRelativeDate, findRelatedEvents, normalizeDateIso, inferDomain, splitIntoProposals, buildMlCommand } from './helpers.ts';
+import { safeJsonParse, writeTempSession, cleanupTemp, resolveThinking, extractDateFromNote, extractDateFromPrime, detectRelativeDate, findRelatedEvents, normalizeDateIso, inferDomain, buildMlCommand } from './helpers.ts';
+import { separateNote } from './separators.ts';
 import { extractAssistantTextFromPiOutput, parseAssistantTextToArray, normalizeParsedArray } from './parser.ts';
 import { buildCollectorPrompt } from './prompt.ts';
 import { runPiCli, runMl } from './cli.ts';
 import { spawn } from 'child_process';
+
+// register optional wizard tool if present
+try{
+  const wizard = await import('./wizard.ts');
+  if(typeof wizard.default === 'function') wizard.default((pi as any));
+}catch(e){ /* ignore: wizard not available in some environments */ }
+
+}
 
 export default function (pi: ExtensionAPI) {
   // In-memory pending proposals per sessionId
@@ -82,12 +91,19 @@ export default function (pi: ExtensionAPI) {
           return;
         }
 
-        // Split note into atomic proposals
-        const proposals = splitIntoProposals(noteBody);
+        // Split note into atomic proposals using the separation skill
+        const sepRes = separateNote(noteBody);
+        const proposals = Array.isArray(sepRes) ? sepRes : (sepRes && Array.isArray(sepRes.proposals) ? sepRes.proposals : []);
         if(!proposals || proposals.length===0){
           await sendUserMessageSafe("No pude extraer propuestas de la nota. Asegúrate de incluir acciones o frases como 'para ...:' en líneas separadas.");
           return;
         }
+        // Optionally inform about newly registered heuristics (if any)
+        try{
+          if(sepRes && Array.isArray((sepRes as any).newlyRegistered) && (sepRes as any).newlyRegistered.length>0){
+            await sendUserMessageSafe('Se detectaron y registraron nuevas heurísticas: ' + (sepRes as any).newlyRegistered.join(', '));
+          }
+        }catch(e){}
 
         const previews: string[] = [];
         const parsedList: any[] = [];
@@ -143,7 +159,7 @@ export default function (pi: ExtensionAPI) {
       }
     });
   } catch (err) {
-    await sendUserMessageSafe("No se pudo registrar el comando /log_diario: " + String(err));
+    sendUserMessageSafe("No se pudo registrar el comando /log_diario: " + String(err));
   }
 
   // No longer needed: /log_diario_confirm command. Confirmation handled via input listener below.
@@ -171,7 +187,7 @@ export default function (pi: ExtensionAPI) {
           proc.stdout.on('data', (d) => { stdout += String(d); });
           proc.stderr.on('data', (d) => { stderr += String(d); });
 
-          const code: number = await new Promise((res) => proc.on('close', res as any));
+          const code: number = await new Promise((resolve) => { proc.on('close', resolve); });
 
           if (code === 0) {
             await sendUserMessageSafe('ml record ejecutado correctamente. stdout:\n' + stdout);
@@ -179,17 +195,17 @@ export default function (pi: ExtensionAPI) {
             // spawn('ml', ['validate']); spawn('ml', ['sync']);
             return;
           } else {
-            await sendUserMessageSafe('Error ejecutando ml record. stderr:\n' + stderr);
+            sendUserMessageSafe('Error ejecutando ml record. stderr:\n' + stderr);
             return;
           }
         } catch (err) {
-          await sendUserMessageSafe('Excepción al ejecutar el comando: ' + String(err));
+          sendUserMessageSafe('Excepción al ejecutar el comando: ' + String(err));
           return;
         }
       }
     });
   } catch (e) {
-    await sendUserMessageSafe("No se pudo registrar /log_diario_run: " + String(e));
+    sendUserMessageSafe("No se pudo registrar /log_diario_run: " + String(e));
   }
 
   // Register a tool as well for programmatic use

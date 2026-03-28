@@ -6,7 +6,7 @@ import { buildMlCommand } from './helpers.ts';
 
 // Minimal TUI wizard component skeleton. Uses ctx.ui.custom((tui,theme,kb,done)=>...) pattern.
 
-export default function (pi: ExtensionAPI) {
+export default function registerWizard(pi: ExtensionAPI) {
   // register tool
   try{
     pi.registerTool?.({
