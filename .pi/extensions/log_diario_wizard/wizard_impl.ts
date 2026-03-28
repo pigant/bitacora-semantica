@@ -87,31 +87,37 @@ export default function registerWizard(pi: ExtensionAPI) {
             render: (width: number) => renderStep(),
             invalidate: () => {},
             handleInput: (data: string) => {
+              console.log('[log_diario_wizard] handleInput called, step=', step, 'data=', JSON.stringify(data));
               // basic key handling
               if(data === "\x1b"){ // Esc
+                console.log('[log_diario_wizard] handleInput: Esc -> calling done(undefined)');
                 done(undefined);
                 return;
               }
               if(data === "\r" || data === "\n"){ // Enter: advance or confirm
+                console.log('[log_diario_wizard] handleInput: Enter at step', step);
                 if(step === 0) { step = 1; tui.requestRender(); return; }
                 if(step >=1 && step <6){ step++; tui.requestRender(); return; }
                 if(step ===6){ // generate commands (return them)
                   const cmd = buildMlCommand(form as any);
+                  console.log('[log_diario_wizard] handleInput: Enter at preview -> calling done with ml_command');
                   done({ ml_command: cmd, form });
                   return;
                 }
               }
               // Ctrl+E execute
               if(data === "\x05"){ // Ctrl+E
+                console.log('[log_diario_wizard] handleInput: Ctrl+E');
                 if(step ===6){ // execute ml record
                   const cmd = buildMlCommand(form as any);
                   try{
                     const { spawnSync } = require('child_process');
                     const parts = String(cmd).split(/\s+/);
                     const p = spawnSync(parts[0], parts.slice(1), { encoding: 'utf-8' });
+                    console.log('[log_diario_wizard] Ctrl+E executed, status=', p.status);
                     done({ executed: true, stdout: p.stdout, stderr: p.stderr, status: p.status });
                     return;
-                  }catch(e){ done({ error: String(e) }); return; }
+                  }catch(e){ console.log('[log_diario_wizard] Ctrl+E error', e); done({ error: String(e) }); return; }
                 }
               }
               // simple inline edits: if user types text, append to relevant field for demo
