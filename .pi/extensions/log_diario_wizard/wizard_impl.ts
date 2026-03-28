@@ -2,7 +2,7 @@ import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-age
 import { Type } from "@sinclair/typebox";
 import { Container, Text, Spacer, SelectList, Input, Editor, BorderedLoader } from "@mariozechner/pi-tui";
 import { truncateToWidth } from "@mariozechner/pi-tui";
-import { buildMlCommand } from './helpers.ts';
+import { buildMlCommand } from '../log_diario/helpers.ts';
 
 // Minimal TUI wizard component skeleton. Uses ctx.ui.custom((tui,theme,kb,done)=>...) pattern.
 

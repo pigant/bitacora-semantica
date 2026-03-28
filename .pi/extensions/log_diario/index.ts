@@ -46,8 +46,6 @@ import { spawn } from 'child_process';
 
 
 // Note: wizard moved to separate extension log_diario_wizard
-}
-
 
 export default function (pi: ExtensionAPI) {
   // In-memory pending proposals per sessionId
