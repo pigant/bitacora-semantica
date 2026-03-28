@@ -1,5 +1,5 @@
 ---
-name: log_diario-separation
+name: log-diario-separation
 description: "Skill que define heurísticas para separar notas en propuestas atómicas y documentar nuevas heurísticas en Mulch cuando correspondan."
 ---
 
