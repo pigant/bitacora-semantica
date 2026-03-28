@@ -15,6 +15,7 @@ export default function registerWizard(pi: ExtensionAPI) {
       description: "Asistente paso a paso para crear registros Mulch (TUI)",
       parameters: Type.Object({ note: Type.Optional(Type.String()), enableLLM: Type.Optional(Type.Boolean()) }),
       async execute(id: string, params: any, signal: AbortSignal | undefined, onUpdate: (upd:any)=>void, ctx: ExtensionContext, meta: Record<string, any>) {
+        console.log('[log_diario_wizard] execute called, id=', id, 'params=', params);
         const note = params?.note || '';
         const enableLLM = params?.enableLLM !== undefined ? params.enableLLM : true;
 
@@ -28,7 +29,9 @@ export default function registerWizard(pi: ExtensionAPI) {
         }
 
         // open overlay TUI
+        console.log('[log_diario_wizard] about to open ctx.ui.custom');
         const result = await ctx.ui.custom((tui, theme, keybindings, done) => {
+          console.log('[log_diario_wizard] ctx.ui.custom renderer created');
           // Use a very small interactive wizard built from primitives
           let step = 0;
 
