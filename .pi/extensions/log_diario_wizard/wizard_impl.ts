@@ -154,7 +154,11 @@ export default function registerWizard(pi: ExtensionAPI) {
     pi.registerCommand('log_diario_wizard', {
       description: 'Abrir wizard TUI para crear registros Mulch',
       handler: async (args, ctx) => {
-        await pi.callTool?.('log_diario_wizard', { note: args || '' } as any);
+        try{
+          console.log('[log_diario_wizard] command handler invoked, args=', args);
+          await pi.callTool?.('log_diario_wizard', { note: args || '' } as any);
+          console.log('[log_diario_wizard] pi.callTool returned');
+        }catch(e){ console.error('[log_diario_wizard] error in command handler', e); try{ await pi.sendUserMessage?.('[log_diario_wizard] error invoking tool: '+String(e)); }catch{} }
       }
     });
   }catch(e){}
