@@ -127,20 +127,32 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         let _ = child.kill();
         let _ = child.wait();
         if !collected.trim().is_empty() {
-            // try parse collected as JSON
+            // try parse collected as JSON, but if assistant returned plain text, wrap it into the expected JSON schema
             match serde_json::from_str::<Value>(collected.trim()) {
                 Ok(j) => return Ok(j),
                 Err(e) => {
-                    // write raw to /tmp for debugging
+                    // write parse error + raw to /tmp for debugging
                     let _ = std::fs::OpenOptions::new()
                         .create(true)
                         .append(true)
                         .open("/tmp/inference_agent_end_raw_text.log")
                         .and_then(|mut f| {
                             use std::io::Write;
+                            let _ = writeln!(f, "PARSE_ERR: {}", e);
                             writeln!(f, "COLLECTED_TEXT: {}", collected)
                         });
-                    return Err(format!("failed to parse assistant JSON: {}", e));
+                    // Fallback: wrap plain text into the expected JSON schema
+                    let fallback = serde_json::json!({
+                        "text": collected.trim(),
+                        "ids": "",
+                        "sources": [],
+                        "confidence": 0.0,
+                        "rationale_notes": "",
+                        "actions": [],
+                        "metadata": { "note": "fallback_from_plain_text" },
+                        "error": null
+                    });
+                    return Ok(fallback);
                 }
             }
         } else {
