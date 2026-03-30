@@ -8,9 +8,7 @@ use std::time::Duration;
 pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json::Value, String> {
     // Build a prompt summarizing the form and asking the assistant to search mulch for related notes
     let prompt = format!(
-        "1. ejecuta `ml prime`
-         2. Busca notas relacionadas con el registro a otorgar despues de las instrucciones a continuación.
-         Devuelve solo un texto conciso para el campo 'Rationale'.\n\nForm:\nTitle: {title}\nDomain: {domain}\nDate: {date}\nParticipants: {participants}\nFiles: {files}\nTags: {tags}\nDescription:\n{description}\n\nRespuesta esperada: un único string con la rationale.\n",
+        "Busca notas relacionadas con el registro a otorgar despues de las instrucciones a continuación.\n\nDevuelve solo un texto conciso para el campo 'Rationale'.\n\nForm:\nTitle: {title}\nDomain: {domain}\nDate: {date}\nParticipants: {participants}\nFiles: {files}\nTags: {tags}\nDescription:\n{description}\n\nRespuesta esperada: un único string con la rationale.\n",
         title = form.title,
         domain = form.domain,
         date = form.date,
@@ -127,7 +125,7 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
 
     // Spawn pi
     let mut cmd = Command::new("pi");
-    cmd.current_dir(dir)
+    cmd.current_dir(&dir)
         .arg("--mode")
         .arg("rpc")
         .arg("--no-session");
@@ -141,8 +139,29 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         Err(e) => return Err(format!("failed to spawn pi: {e}")),
     };
 
-    // Augment prompt with local matches and mulch presence info
+    // Run `ml prime` in the repo to capture Mulch context, include its output (truncated) in the prompt
+    let mut prime_output = String::new();
+    match Command::new("ml").arg("prime").current_dir(&dir).output() {
+        Ok(out) => {
+            prime_output = String::from_utf8_lossy(&out.stdout).to_string();
+            if prime_output.trim().is_empty() {
+                // capture stderr if no stdout
+                prime_output = String::from_utf8_lossy(&out.stderr).to_string();
+            }
+        }
+        Err(e) => {
+            prime_output = format!("(failed to run ml prime: {})", e);
+        }
+    }
+    // remove the session-close protocol section if present
+    if let Some(idx) = prime_output.find("# 🚨 SESSION CLOSE PROTOCOL 🚨") {
+        prime_output.truncate(idx);
+    }
+
+    // build full prompt including prime output
     let mut prompt_full = prompt.clone();
+    prompt_full.push_str(&format!("\nMulchPrimeOutput:\n{}\n", prime_output));
+    prompt_full.push_str("Nota: `ml prime` ya fue ejecutado y su salida se incluye arriba. NO ejecutes `ml prime` de nuevo.\n");
     prompt_full.push_str(&format!(
         "\nMetadata:\n- mulch_initialized: {}\n- local_matches_count: {}\n",
         mulch_found,
@@ -161,6 +180,15 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
 
     // take child stdin and keep it so we can send follow-ups if needed
     let mut child_stdin = child.stdin.take();
+
+    // send initial prompt_full to the agent
+    if let Some(stdin) = child_stdin.as_mut() {
+        let obj = serde_json::json!({ "type": "prompt", "message": prompt_full });
+        let s = obj.to_string() + "\n";
+        let _ = stdin.write_all(s.as_bytes());
+        let _ = stdin.flush();
+        // keep stdin open for follow-ups
+    }
 
     // Read stdout lines until we find an assistant message containing the rationale
     let stdout = child.stdout.take().unwrap();
