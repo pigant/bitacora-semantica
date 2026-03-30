@@ -20,23 +20,103 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         description = form.description
     );
 
-    // Buscar desde el directorio actual hacia arriba para encontrar el path de mulch
+    // Detectar si existe .mulch en el repo (no abortamos si falta; lo incluimos en el prompt)
     let mut dir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
-    let mut found = false;
+    let mut mulch_found = false;
     while dir.parent().is_some() {
         if dir.join(".mulch").exists() {
-            found = true;
+            mulch_found = true;
             break;
         }
         dir = dir.parent().unwrap().to_path_buf();
     }
-    if !found {
-        return Err("no se encontró mulch en el directorio actual ni en los superiores".into());
+
+    // Recolectar coincidencias locales básicas (ruta + snippet) para dar contexto cuando no haya mulch
+    let mut local_matches: Vec<serde_json::Value> = Vec::new();
+    // keywords: domain + words from title + words from description (simple split)
+    let mut keywords: Vec<String> = Vec::new();
+    if !form.domain.trim().is_empty() {
+        keywords.push(form.domain.to_lowercase());
     }
+    for part in form.title.split_whitespace().chain(form.description.split_whitespace()) {
+        let p = part.trim().trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+        if p.len() >= 3 && !keywords.contains(&p) {
+            keywords.push(p);
+        }
+        if keywords.len() >= 8 {
+            break;
+        }
+    }
+
+    // walk repository tree (depth-first), limited to 10 matches
+    let mut matches_found = 0usize;
+    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
+    let mut stack = vec![cwd.clone()];
+    while let Some(path) = stack.pop() {
+        if matches_found >= 10 {
+            break;
+        }
+        let meta = match std::fs::metadata(&path) {
+            Ok(m) => m,
+            Err(_) => continue,
+        };
+        if meta.is_dir() {
+            // skip ignored dirs
+            if let Some(n) = path.file_name().and_then(|s| s.to_str()) {
+                if n == "target" || n == ".git" || n == ".mulch" || n == "node_modules" {
+                    continue;
+                }
+            }
+            if let Ok(rd) = std::fs::read_dir(&path) {
+                for e in rd.filter_map(Result::ok) {
+                    stack.push(e.path());
+                }
+            }
+        } else if meta.is_file() {
+            // try read as text
+            if let Ok(s) = std::fs::read_to_string(&path) {
+                for (lineno, line) in s.lines().enumerate() {
+                    let low = line.to_lowercase();
+                    for kw in &keywords {
+                        if low.contains(kw) {
+                            // create snippet truncated
+                            let snippet = if line.len() > 200 { format!("{}...", &line[..200]) } else { line.to_string() };
+                            local_matches.push(serde_json::json!({
+                                "path": path.to_string_lossy().to_string(),
+                                "lineno": lineno + 1,
+                                "snippet": snippet,
+                            }));
+                            matches_found += 1;
+                            break;
+                        }
+                    }
+                    if matches_found >= 10 {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // write local matches to /tmp for debugging
+    let _ = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("/tmp/inference_local_matches.log")
+        .and_then(|mut f| {
+            use std::io::Write;
+            let _ = writeln!(f, "mulch_found: {}", mulch_found);
+            let _ = writeln!(f, "keywords: {:?}", keywords);
+            let _ = writeln!(f, "local_matches: {}", serde_json::to_string_pretty(&local_matches).unwrap_or_default());
+            Ok(())
+        });
 
     // Spawn pi
     let mut cmd = Command::new("pi");
-    cmd.arg("--mode").arg("rpc").arg("--no-session");
+    cmd.current_dir(dir)
+        .arg("--mode")
+        .arg("rpc")
+        .arg("--no-session");
     // ensure we don't inherit stdio
     cmd.stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -47,9 +127,22 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         Err(e) => return Err(format!("failed to spawn pi: {e}")),
     };
 
-    // Write the prompt as JSONL
+    // Augment prompt with local matches and mulch presence info
+    let mut prompt_full = prompt.clone();
+    prompt_full.push_str(&format!("\nMetadata:\n- mulch_initialized: {}\n- local_matches_count: {}\n", mulch_found, local_matches.len()));
+    if !local_matches.is_empty() {
+        prompt_full.push_str("LocalMatches:\n");
+        for m in &local_matches {
+            let path = m.get("path").and_then(|p| p.as_str()).unwrap_or("");
+            let lineno = m.get("lineno").and_then(|n| n.as_u64()).unwrap_or(0);
+            let snippet = m.get("snippet").and_then(|s| s.as_str()).unwrap_or("");
+            prompt_full.push_str(&format!("- {}:{}: {}\n", path, lineno, snippet));
+        }
+    }
+    prompt_full.push_str("\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. metadata debe incluir 'mulch_initialized' y 'local_matches_count'.\n");
+
     if let Some(mut stdin) = child.stdin.take() {
-        let obj = serde_json::json!({ "type": "prompt", "message": prompt });
+        let obj = serde_json::json!({ "type": "prompt", "message": prompt_full });
         let s = obj.to_string() + "\n";
         let _ = stdin.write_all(s.as_bytes());
         // close stdin to signal end
