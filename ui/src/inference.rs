@@ -38,8 +38,15 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
     if !form.domain.trim().is_empty() {
         keywords.push(form.domain.to_lowercase());
     }
-    for part in form.title.split_whitespace().chain(form.description.split_whitespace()) {
-        let p = part.trim().trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+    for part in form
+        .title
+        .split_whitespace()
+        .chain(form.description.split_whitespace())
+    {
+        let p = part
+            .trim()
+            .trim_matches(|c: char| !c.is_alphanumeric())
+            .to_lowercase();
         if p.len() >= 3 && !keywords.contains(&p) {
             keywords.push(p);
         }
@@ -80,7 +87,11 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
                     for kw in &keywords {
                         if low.contains(kw) {
                             // create snippet truncated
-                            let snippet = if line.len() > 200 { format!("{}...", &line[..200]) } else { line.to_string() };
+                            let snippet = if line.len() > 200 {
+                                format!("{}...", &line[..200])
+                            } else {
+                                line.to_string()
+                            };
                             local_matches.push(serde_json::json!({
                                 "path": path.to_string_lossy().to_string(),
                                 "lineno": lineno + 1,
@@ -103,12 +114,15 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         .create(true)
         .append(true)
         .open("/tmp/inference_local_matches.log")
-        .and_then(|mut f| {
+        .map(|mut f| {
             use std::io::Write;
-            let _ = writeln!(f, "mulch_found: {}", mulch_found);
-            let _ = writeln!(f, "keywords: {:?}", keywords);
-            let _ = writeln!(f, "local_matches: {}", serde_json::to_string_pretty(&local_matches).unwrap_or_default());
-            Ok(())
+            let _ = writeln!(f, "mulch_found: {mulch_found}");
+            let _ = writeln!(f, "keywords: {keywords:?}");
+            let _ = writeln!(
+                f,
+                "local_matches: {}",
+                serde_json::to_string_pretty(&local_matches).unwrap_or_default()
+            );
         });
 
     // Spawn pi
@@ -129,24 +143,24 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
 
     // Augment prompt with local matches and mulch presence info
     let mut prompt_full = prompt.clone();
-    prompt_full.push_str(&format!("\nMetadata:\n- mulch_initialized: {}\n- local_matches_count: {}\n", mulch_found, local_matches.len()));
+    prompt_full.push_str(&format!(
+        "\nMetadata:\n- mulch_initialized: {}\n- local_matches_count: {}\n",
+        mulch_found,
+        local_matches.len()
+    ));
     if !local_matches.is_empty() {
         prompt_full.push_str("LocalMatches:\n");
         for m in &local_matches {
             let path = m.get("path").and_then(|p| p.as_str()).unwrap_or("");
             let lineno = m.get("lineno").and_then(|n| n.as_u64()).unwrap_or(0);
             let snippet = m.get("snippet").and_then(|s| s.as_str()).unwrap_or("");
-            prompt_full.push_str(&format!("- {}:{}: {}\n", path, lineno, snippet));
+            prompt_full.push_str(&format!("- {path}:{lineno}: {snippet}\n"));
         }
     }
     prompt_full.push_str("\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. metadata debe incluir 'mulch_initialized' y 'local_matches_count'.\n");
 
-    if let Some(mut stdin) = child.stdin.take() {
-        let obj = serde_json::json!({ "type": "prompt", "message": prompt_full });
-        let s = obj.to_string() + "\n";
-        let _ = stdin.write_all(s.as_bytes());
-        // close stdin to signal end
-    }
+    // take child stdin and keep it so we can send follow-ups if needed
+    let mut child_stdin = child.stdin.take();
 
     // Read stdout lines until we find an assistant message containing the rationale
     let stdout = child.stdout.take().unwrap();
@@ -215,40 +229,141 @@ pub fn infer_rationale_from_form(form: &crate::state::Form) -> Result<serde_json
         }
     }
 
-    // upon seeing agent_end, kill the child process to free resources, then wait for it
+    // upon seeing agent_end, try to parse result; if not usable, send a follow-up prompt in the same session
     if saw_agent_end {
-        let _ = child.kill();
-        let _ = child.wait();
         if !collected.trim().is_empty() {
-            // try parse collected as JSON, but if assistant returned plain text, wrap it into the expected JSON schema
+            // try parse collected as JSON
             match serde_json::from_str::<Value>(collected.trim()) {
-                Ok(j) => return Ok(j),
-                Err(e) => {
-                    // write parse error + raw to /tmp for debugging
-                    let _ = std::fs::OpenOptions::new()
-                        .create(true)
-                        .append(true)
-                        .open("/tmp/inference_agent_end_raw_text.log")
-                        .and_then(|mut f| {
-                            use std::io::Write;
-                            let _ = writeln!(f, "PARSE_ERR: {}", e);
-                            writeln!(f, "COLLECTED_TEXT: {}", collected)
-                        });
-                    // Fallback: wrap plain text into the expected JSON schema
-                    let fallback = serde_json::json!({
-                        "text": collected.trim(),
-                        "ids": "",
-                        "sources": [],
-                        "confidence": 0.0,
-                        "rationale_notes": "",
-                        "actions": [],
-                        "metadata": { "note": "fallback_from_plain_text" },
-                        "error": null
-                    });
-                    return Ok(fallback);
+                Ok(j) => {
+                    // if JSON contains sources or ids, accept it
+                    let has_sources = j.get("sources").and_then(|s| s.as_array()).map(|a| !a.is_empty()).unwrap_or(false);
+                    let has_ids = j.get("ids").and_then(|i| i.as_str()).map(|s| !s.trim().is_empty()).unwrap_or(false);
+                    if has_sources || has_ids {
+                        let _ = child.kill();
+                        let _ = child.wait();
+                        return Ok(j);
+                    }
+                    // otherwise we'll attempt a follow-up
+                }
+                Err(_) => {
+                    // parse failed; we'll attempt a follow-up
                 }
             }
+
+            // build follow-up prompt asking to convert previous text into the exact JSON schema
+            let followup = format!(
+                "Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste ids, ids debe ser \"\" y confidence 0. Incluye metadata.mulch_initialized={} y metadata.local_matches_count={}. Si no hay sources, incluye suggested_queries en metadata. Devuelve SOLO JSON y nada más.",
+                mulch_found, local_matches.len()
+            );
+
+            if let Some(stdin) = child_stdin.as_mut() {
+                let obj = serde_json::json!({ "type": "prompt", "message": followup });
+                let s = obj.to_string() + "\n";
+                let _ = stdin.write_all(s.as_bytes());
+                let _ = stdin.flush();
+                // wait up to extra_timeout for a second agent_end
+                let extra_start = std::time::Instant::now();
+                let extra_timeout = Duration::from_secs(20);
+                let mut second_collected = String::new();
+                while extra_start.elapsed() < extra_timeout {
+                    line.clear();
+                    match reader.read_line(&mut line) {
+                        Ok(0) => break,
+                        Ok(_) => {
+                            if let Ok(v) = serde_json::from_str::<Value>(line.trim()) {
+                                if v.get("type").and_then(|x| x.as_str()) == Some("agent_end") {
+                                    // log
+                                    let _ = std::fs::OpenOptions::new()
+                                        .create(true)
+                                        .append(true)
+                                        .open("/tmp/inference_followup.log")
+                                        .and_then(|mut f| {
+                                            use std::io::Write;
+                                            writeln!(f, "FOLLOWUP_AGENT_END_RAW: {}", serde_json::to_string(&v).unwrap_or_default())
+                                        });
+                                    if let Some(msgs) = v.get("messages").and_then(|m| m.as_array()) {
+                                        for msg in msgs {
+                                            if msg.get("role").and_then(|r| r.as_str()) == Some("assistant") {
+                                                if let Some(content) = msg.get("content").and_then(|c| c.as_array()) {
+                                                    for block in content {
+                                                        if block.get("type").and_then(|x| x.as_str()) == Some("text") {
+                                                            if let Some(txt) = block.get("text").and_then(|x| x.as_str()) {
+                                                                second_collected.push_str(txt);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        Err(_) => break,
+                    }
+                }
+
+                // after follow-up wait, try parse second_collected
+                if !second_collected.trim().is_empty() {
+                    if let Ok(j2) = serde_json::from_str::<Value>(second_collected.trim()) {
+                        let _ = child.kill();
+                        let _ = child.wait();
+                        return Ok(j2);
+                    } else {
+                        // write to raw log and fallback
+                        let _ = std::fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open("/tmp/inference_agent_end_raw_text.log")
+                            .and_then(|mut f| {
+                                use std::io::Write;
+                                let _ = writeln!(f, "FOLLOWUP_PARSE_ERR");
+                                writeln!(f, "SECOND_COLLECTED: {}", second_collected)
+                            });
+                        let fallback = serde_json::json!({
+                            "text": second_collected.trim(),
+                            "ids": "",
+                            "sources": [],
+                            "confidence": 0.0,
+                            "rationale_notes": "",
+                            "actions": [],
+                            "metadata": { "note": "fallback_from_followup" },
+                            "error": null
+                        });
+                        let _ = child.kill();
+                        let _ = child.wait();
+                        return Ok(fallback);
+                    }
+                }
+            }
+
+            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected
+            let _ = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open("/tmp/inference_agent_end_raw_text.log")
+                .and_then(|mut f| {
+                    use std::io::Write;
+                    let _ = writeln!(f, "PARSE_ERR and no followup reply");
+                    writeln!(f, "COLLECTED_TEXT: {}", collected)
+                });
+            let fallback = serde_json::json!({
+                "text": collected.trim(),
+                "ids": "",
+                "sources": [],
+                "confidence": 0.0,
+                "rationale_notes": "",
+                "actions": [],
+                "metadata": { "note": "fallback_from_plain_text_no_followup" },
+                "error": null
+            });
+            let _ = child.kill();
+            let _ = child.wait();
+            return Ok(fallback);
         } else {
+            let _ = child.kill();
+            let _ = child.wait();
             return Err("agent finished but no text collected".into());
         }
     }
