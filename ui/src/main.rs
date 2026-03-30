@@ -11,6 +11,7 @@ use serde_json::Value;
 use state::{AppState, FIELD_COUNT};
 mod inference; // inference helper
 use inference::infer_rationale_from_form;
+
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::{
@@ -111,7 +112,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(vec) => {
                         app.suggestions = vec;
                         app.suggestion_loading = false;
-                        app.toast = Some(("Sugerencias recibidas".into(), Instant::now()));
+                        // check for inference autofill marker
+                        if let Some(first) = app.suggestions.get(0) {
+                            if first.get("autofill").and_then(|b| b.as_bool()) == Some(true) {
+                                if let Some(rt) = first.get("rationale_text").and_then(|t| t.as_str()) {
+                                    app.form.rationale = rt.to_string();
+                                    app.toast = Some(("Rationale autofilled".into(), Instant::now()));
+                                }
+                            } else {
+                                app.toast = Some(("Sugerencias recibidas".into(), Instant::now()));
+                            }
+                        } else {
+                            app.toast = Some(("Sugerencias recibidas".into(), Instant::now()));
+                        }
                     }
                     Err(e) => {
                         app.suggestion_error = Some(e);
@@ -264,10 +277,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     thread::spawn(move || {
                                         let res = infer_rationale_from_form(&form_snapshot);
                                         match res {
-                                            InferenceResult::Ok(r) => {
-                                                let _ = tx.send((req_id, Ok(vec![serde_json::json!({"id":"inference","title":"rationale","snippet":r})])));
+                                            Ok(v) => {
+                                                // v is the parsed JSON from the assistant. Expect fields: text, ids, sources, confidence
+                                                let text = v.get("text").and_then(|t| t.as_str()).unwrap_or("").to_string();
+                                                let confidence = v.get("confidence").and_then(|c| c.as_f64()).unwrap_or(0.0);
+                                                // build suggestions vector from sources if present
+                                                let mut suggestions: Vec<serde_json::Value> = Vec::new();
+                                                if let Some(sources) = v.get("sources").and_then(|s| s.as_array()) {
+                                                    for s in sources {
+                                                        suggestions.push(s.clone());
+                                                    }
+                                                }
+                                                // prepend an inference meta entry
+                                                let autofill = confidence >= 0.75 && !text.is_empty();
+                                                let meta = serde_json::json!({
+                                                    "id": "inference",
+                                                    "title": "Rationale suggestion",
+                                                    "snippet": text.clone(),
+                                                    "rationale_text": text.clone(),
+                                                    "autofill": autofill,
+                                                    "confidence": confidence
+                                                });
+                                                suggestions.insert(0, meta);
+                                                let _ = tx.send((req_id, Ok(suggestions)));
                                             }
-                                            InferenceResult::Err(e) => {
+                                            Err(e) => {
                                                 let _ = tx.send((req_id, Err(e)));
                                             }
                                         }
