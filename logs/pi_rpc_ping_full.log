@@ -1,0 +1,13 @@
+[2026-03-31T17:24:43.136Z] in: {"message":"ping","type":"prompt"}
+[2026-03-31T17:24:43.136Z] out: CMD_CREATED: pi
+[2026-03-31T17:24:43.136Z] out: WORKDIR: /mnt/disk/trabajo/cencosud/bitacora
+[2026-03-31T17:24:43.136Z] out: ARGS: --mode rpc --no-session
+[2026-03-31T17:24:43.136Z] out: SENT_PROMPT
+[2026-03-31T17:24:43.136Z] out: OUT: {"type":"response","command":"prompt","success":true}
+[2026-03-31T17:24:43.136Z] out: OUT: {"type":"agent_start"}
+[2026-03-31T17:24:43.136Z] out: OUT: {"type":"turn_start"}
+[2026-03-31T17:24:43.136Z] out: OUT: {"type":"message_start","message":{"role":"user","content":[{"type":"text","text":"ping"}],"timestamp":1774871500807}}
+[2026-03-31T17:24:43.136Z] out: OUT: {"type":"message_end","message":{"role":"user","content":[{"type":"text","text":"ping"}],"timestamp":1774871500807}}
+[2026-03-31T17:24:43.136Z] out: OUT: STDOUT_EOF
+[2026-03-31T17:24:43.136Z] out: BREAK: stdout EOF
+[2026-03-31T17:24:43.136Z] out: STDERR_EOF

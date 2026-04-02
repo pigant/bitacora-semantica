@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/log-record.schema.json",
+  "title": "Log Record Schema",
+  "description": "JSON Schema for Log Diario records (Decision, Fact, Assumption, Meeting, Action, Person, Evidence, Outcome)",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/definitions/Decision" },
+    { "$ref": "#/definitions/Fact" },
+    { "$ref": "#/definitions/Assumption" },
+    { "$ref": "#/definitions/Meeting" },
+    { "$ref": "#/definitions/Action" },
+    { "$ref": "#/definitions/Person" }
+  ],
+
+  "definitions": {
+    "BaseRecord": {
+      "type": "object",
+      "properties": {
+        "@context": { "type": "string" },
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "domain": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "classification": { "type": "string", "enum": ["foundational","tactical","observational"] },
+        "author": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/definitions/Evidence" } },
+        "outcomes": { "type": "array", "items": { "$ref": "#/definitions/Outcome" } },
+        "links": { "type": "array", "items": { "$ref": "#/definitions/Link" } },
+        "status": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "impact": { "type": "string", "enum": ["low","medium","high"] },
+        "related_files": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "type": "object" }
+      },
+      "required": ["id","type","recorded_at"],
+      "additionalProperties": true
+    },
+
+    "Decision": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Decision" },
+            "rationale": { "type": "string" },
+            "options_considered": { "type": "array", "items": { "type": "string" } },
+            "chosen_option": { "type": "string" },
+            "effective_from": { "type": "string", "format": "date" },
+            "consequences": { "type": "string" },
+            "impacted_components": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["title","rationale"]
+        }
+      ]
+    },
+
+    "Fact": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Fact" },
+            "observation": { "type": "string" }
+          },
+          "required": ["observation"]
+        }
+      ]
+    },
+
+    "Assumption": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Assumption" },
+            "assumption_statement": { "type": "string" },
+            "tests_needed": { "type": "array", "items": { "type": "string" } },
+            "expire_at": { "type": "string", "format": "date" }
+          },
+          "required": ["assumption_statement"]
+        }
+      ]
+    },
+
+    "Meeting": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Meeting" },
+            "date": { "type": "string" },
+            "location": { "type": "string" },
+            "minutes": { "type": "string" },
+            "decisions_made": { "type": "array", "items": { "type": "string" } },
+            "actions": { "type": "array", "items": { "$ref": "#/definitions/Action" } }
+          },
+          "required": ["title","date"]
+        }
+      ]
+    },
+
+    "Action": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseRecord" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Action" },
+            "title": { "type": "string" },
+            "assigned_to": { "type": "string" },
+            "due_date": { "type": "string" },
+            "parent_decision": { "type": "string" },
+            "outcome": { "$ref": "#/definitions/Outcome" }
+          },
+          "required": ["title"]
+        }
+      ]
+    },
+
+    "Person": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "Person" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "contact": { "type": "string" }
+      },
+      "required": ["id","name"],
+      "additionalProperties": false
+    },
+
+    "Evidence": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["commit","file","issue","screenshot","link","bead"] },
+        "reference": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "recorded_by": { "type": "string" }
+      },
+      "required": ["type","reference"],
+      "additionalProperties": false
+    },
+
+    "Outcome": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["success","failure","partial"] },
+        "notes": { "type": "string" },
+        "duration": { "type": "number" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "agent": { "type": "string" }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    },
+
+    "Link": {
+      "type": "object",
+      "properties": {
+        "relation": { "type": "string", "enum": ["relatesTo","supersedes","references","dependsOn","recordedInMeeting","derivedFrom","confirms","contradicts"] },
+        "target": { "type": "string" },
+        "rationale": { "type": "string" },
+        "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["relation","target"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,5 @@
+[2026-03-31T17:24:43.136Z] {"type":"response","command":"prompt","success":true}
+[2026-03-31T17:24:43.136Z] {"type":"agent_start"}
+[2026-03-31T17:24:43.136Z] {"type":"turn_start"}
+[2026-03-31T17:24:43.136Z] {"type":"message_start","message":{"role":"user","content":[{"type":"text","text":"Domain: kiosco Description: Los pinpad finalmente son instalados en cenco florida\n        run `ml prime` and find any record that have a relation with the domain and description given RETURN ONLY a SINGLE JSON ARRAY (and NOTHING else) with objects {id,title,snippet,origin}. If none, return []."}],"timestamp":1774794511436}}
+[2026-03-31T17:24:43.136Z] {"type":"message_end","message":{"role":"user","content":[{"type":"text","text":"Domain: kiosco Description: Los pinpad finalmente son instalados en cenco florida\n        run `ml prime` and find any record that have a relation with the domain and description given RETURN ONLY a SINGLE JSON ARRAY (and NOTHING else) with objects {id,title,snippet,origin}. If none, return []."}],"timestamp":1774794511436}}

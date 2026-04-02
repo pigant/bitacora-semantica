@@ -1,0 +1,6 @@
+Para el jueves 26 de marzo de 2026
+SAI: Maria Nicole avisa a Paolo Castillo que hay unas garantias que no estan cruzando bien desde el reporte de Cesar Follert (Se cambia garantia por robo por una normal). Paolo queda de revisar que puede estar pasando
+general: Me reuno con Marcia Luengo de WITI para hacer una evaluación de desempeño de todos los integrantes WITI en el equipo
+Pos movil: Me junto con Roberto Valenzuela, Silvana Vitali y Patricio Villarroel, a revisar los avances de pos movil, quedamos en que hay que hacer algunas mejoras: Mostrar garantias en el historial de ordenes;
+mostrar en el control panel
+POS Movil: tambien de la reunion se descubre que Sales Orders tiene problemas con su graphql de staging para mostrar las ordenes que contemplen garantias, se les entrego la informacion y quedaron en reparar

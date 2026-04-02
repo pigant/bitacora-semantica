@@ -1,267 +1,163 @@
 ---
 name: mulch-skill
-description: "Genera conocimiento accionable para una base de conocimiento: detecta hallazgos relevantes, prioriza registros atómicos, identifica archivos afectados y crea entradas individuales vinculadas por globs; puede usarse tanto para guardarla como para consultarla cuando falte contexto."
+description: "Registra y consulta bitácora diaria por proyecto (dominio)"
 ---
 
-# Skill: Mulch (agente)
+# Skill: Mulch (bitácora diaria de proyectos)
 
-## Propósito
+## Objetivo
+Esta skill está orientada a **guardar registros diarios de trabajo**.
 
-Apoyar al agente en convertir cambios de código y hallazgos en conocimiento estructurado dentro de `.mulch/expertise/`.
-
-## Principios clave (para el agente)
-
-- **Siempre** registra cada hallazgo o lección por separado: un cambio = un record.
-- Usa `ml prime` para cargar contexto antes de trabajar.
-- Usa `ml learn` para encontrar qué cambió y qué falta documentar.
-- Usa `ml record` para capturar el conocimiento (con `--files` cuando sea posible).
-- Mantén `.mulch/` consistente con `ml validate` y `ml sync`.
+Regla principal de modelado:
+- Cada **dominio = un proyecto**.
+- Usar `general` solo para trabajo transversal (sin proyecto único).
 
 ---
 
-## Flujo de trabajo recomendado
+## Modelo de registro recomendado
 
-### 1) Cargar contexto (siempre primero)
+Un registro debe capturar una unidad de trabajo diaria con valor de seguimiento:
+- Qué se hizo.
+- Por qué se hizo.
+- Evidencia/contexto (personas, archivos, links internos, impacto).
 
+### Plantilla base
+```bash
+ml record <dominio_proyecto> --type <type> --title "<titulo breve>" \
+  --rationale "<motivo o contexto de negocio/técnico>" \
+  --description "<detalle de lo ejecutado y resultado>" \
+  --files "<glob opcional>"
+```
+
+> Si no hay archivos, **omitir `--files`**.
+
+---
+
+## Política de dominios (importante)
+
+1. Antes de registrar, verificar dominios existentes:
+```bash
+ml status
+```
+
+2. Selección de dominio:
+- Si el trabajo pertenece claramente a un proyecto: usar ese dominio.
+- Si involucra varios proyectos o tareas transversales: usar `general`.
+
+3. No crear dominios ambiguos tipo `misc`, `otros`, `tmp`.
+
+---
+
+## Tipos recomendados para bitácora diaria
+
+- `guide`: procedimiento ejecutado (pasos operativos del día).
+- `decision`: decisión tomada (requiere justificación clara).
+- `failure`: incidente/error + resolución aplicada.
+- `reference`: dato operativo de referencia para el proyecto.
+- `pattern`: forma repetible de operar o resolver tareas.
+
+---
+
+## Criterio de atomicidad
+
+- Un registro = una unidad de trabajo entendible por sí sola.
+- Si en el día hubo 3 cambios distintos en un proyecto, crear 3 registros.
+- No mezclar en un mismo registro: incidente + decisión + guía no relacionada.
+
+---
+
+## Flujo recomendado diario
+
+1. Cargar contexto del repo/proyecto:
 ```bash
 ml prime
-# o para enfoque puntual:
-ml prime --files "src/modules/basket/**"
 ```
 
-### 2) Detectar cambios a revisar
-
+2. Revisar estado y dominios:
 ```bash
-ml learn --since <ref>
+ml status
 ```
 
-- Muestra qué archivos cambiaron, qué dominios sugieren y qué archivos no están asociados.
-- NO muestra “lo aprendido”, solo qué vale la pena revisar.
-
-### 3) Crear registros (uno por cada hallazgo)
-
-Ejemplo base:
+3. Registrar cada hallazgo diario de forma atómica:
 ```bash
-ml record <domain> --type <type> --name "<titulo>" \
-  --description "<qué y por qué>" \
-  --files "<glob>"
+ml record <dominio> --type <type> --title "..." --rationale "..." --description "..."
 ```
 
-**Nota importante:** cada idea/hallazgo debe ser un record independiente. No combines múltiples lecciones en un solo registro.
-
-### 4) Validar & versionar
-
+4. Validar base:
 ```bash
 ml validate
-ml sync
 ```
 
 ---
 
-## Comandos clave (y cuándo usarlos)
+## Consulta y seguimiento
 
-### `ml learn` — detectar cambios sin registrar
-
-- Objetivo: identificar archivos cambiados que no están asociados a registros existentes.
-- Útil para decidir qué registrar mediante `ml record`.
-
-Ejemplo:
+- Ver registros del proyecto:
 ```bash
-ml learn --since main
+ml query <dominio>
 ```
 
-### `ml record` — capturar conocimiento
+- Buscar por texto en toda la base:
+```bash
+ml search "<consulta>"
+```
 
-- Usa siempre `--files` si quieres que Mulch relacione el registro con archivos específicos.
-- **Registra cada hallazgo de forma individual**.
-
-Tipos frecuentes:
-- `convention` → reglas de estilo / arquitectura.
-- `pattern` → flujos repetibles / pipeline / decoradores.
-- `failure` → error + resolución.
-- `decision` → decisión arquitectónica (requiere `--title` y `--rationale`).
-- `reference` → información de referencia (endpoints, archivos, datos clave).
-- `guide` → pasos de ejecución/procedimiento.
-
-### `ml prime` — carga contexto
-
-- Carga toda la base de conocimiento:
-  ```bash
-  ml prime
-  ```
-- Para enfocar en archivos específicos:
-  ```bash
-  ml prime --files "src/modules/**"
-  ```
-
-### `ml sync` — sincronizar cambios
-
-- Valida y guarda cambios en `.mulch/`:
-  ```bash
-  ml sync
-  ```
+- Registrar resultado posterior de una decisión/acción:
+```bash
+ml outcome <dominio> <id> --status <success|failure|partial> --notes "<resultado observado>"
+```
 
 ---
 
-## Comandos de apoyo útiles
+## Buenas prácticas específicas de bitácora
 
-- `ml validate`: valida la estructura de los registros.
-- `ml status`: muestra estado de dominios y advertencias.
-- `ml query <domain>`: listar registros de un dominio.
-- `ml search <query>`: buscar texto en registros (BM25).
-- `ml prune --dry-run`: encontrar registros obsoletos.
-- `ml doctor --fix`: arreglar formato/duplicados.
-- `ml diff <ref>`: ver cambios en `.mulch/` entre refs.
+### Sí registrar
+- Instalaciones, despliegues, migraciones, cambios de configuración.
+- Incidentes del día y cómo se resolvieron.
+- Decisiones operativas con impacto.
+- Coordinación relevante entre personas/equipos.
 
-
-### Buscar un ID o confirmar contexto
-
-Para encontrar rápidamente un registro por su identificador dentro de un dominio o confirmar que un ID aparece en la salida de `ml query`, use:
-
-```bash
-mulch query <DOMINIO> | grep <ID>
-```
-
-Esto es útil cuando el dominio ya está identificado pero necesitas verificar la presencia o el título resumido del bead (por ejemplo `mx-363c14`). Alternativamente, si ya ejecutaste `ml prime`, puedes usar el contexto primado por `ml prime` para orientar la búsqueda y evitar búsquedas globales.
+### No registrar
+- Cambios triviales sin impacto.
+- Notas personales sin contexto de proyecto.
+- Entradas duplicadas del mismo hecho.
 
 ---
 
-## Asociar archivos a dominios
+## Convenciones de títulos (sugeridas)
 
-Para que `ml learn` sugiera un dominio, debe existir un record que mencione los archivos con `--files`.
+Formato sugerido:
+- `YYYY-MM-DD: acción principal en <proyecto/sitio>`
 
-Ejemplo:
-```bash
-ml record basket --type reference --name "Estructura del módulo basket" \
-  --description "Archivos y pipeline de basket" \
-  --files "src/modules/basket/**"
-```
-
-A partir de entonces, cambios en `src/modules/basket/**` aparecerán sugeridos bajo `basket`.
+Ejemplos:
+- `2026-03-31: instalación de pinpad en cenco florida`
+- `2026-03-31: ajuste de configuración kiosco por timeout`
+- `2026-03-31: resolución de fallo de enrolamiento`
 
 ---
 
-## Criterios para decidir qué registrar
+## Ejemplos
 
-Registra cuando el cambio implica:
-- una decisión (arquitectura, dependencias, etc.).
-- un patrón reutilizable o un proceso común.
-- un error y su resolución (incluyendo ajustes en dependencias).
-- una referencia importante (endpoint, contrato, formato de datos).
+### Registro diario por proyecto
+```bash
+ml record kiosco --type guide --title "2026-03-31: instalación de pinpad en cenco florida" \
+  --rationale "Habilitar kioscos nuevos para operación comercial" \
+  --description "Se instalaron equipos recibidos el día anterior y se validó operación básica en sala" \
+  --files "operaciones/kiosco/**"
+```
 
-No registres:
-- cambios triviales o renombres sin impacto.
-- detalles que no aportan valor generalizable.
-- notas personales sin valor para otros.
+### Registro transversal
+```bash
+ml record general --type decision --title "2026-03-31: priorización de soporte en horario punta" \
+  --rationale "Reducir impacto en atención de tiendas con mayor volumen" \
+  --description "Se definió ventana de atención y criterio de escalamiento para incidencias compartidas"
+```
 
 ---
 
-## Consejos para búsquedas efectivas
+## Regla operativa final
 
-Para que los registros se encuentren con `ml search`, usa:
-- palabras clave técnicas (ej. `retry`, `circuit breaker`, `timeout`).
-- sinónimos (ej. `timeout` / `time out`).
-- nombres de archivos, módulos o endpoints.
-- frases claras y concisas.
-- `ml diff main..HEAD` para ver qué se agregó/cambió en `.mulch/` entre commits.
-- `ml search <query>` para encontrar outcomes, fallos o decisiones similares.
-
-Esto evita duplicados y permite usar outcomes existentes como base para nuevas acciones.
-
----
-
-### `ml upgrade [options]`
-**Qué hace:** Actualiza Mulch CLI (si está instalado globalmente) o verifica versión.
-
-- ✅ **Usar cuando:** quieres la última versión.
-- ❌ **No usar cuando:** prefieres mantener la versión fija.
-
-Ejemplo:
-```bash
-ml upgrade --check
-ml upgrade
-```
-
-> Nota: existe `ml update` pero está deprecado; usa `ml upgrade`.
-
-### `ml completions <shell>`
-**Qué hace:** Genera script de autocompletado para bash/zsh/fish.
-
-- ✅ **Usar cuando:** quieres mejorar la experiencia en la CLI.
-
-Ejemplo:
-```bash
-ml completions bash > ~/.bashrc
-```
-
-### `ml delete <domain> <id>` (borrar registros)
-**Qué hace:** elimina uno o varios registros de un dominio.
-
-**Uso básico:**
-```bash
-ml delete <domain> <id>
-```
-
-**Opciones útiles:**
-- `--records <ids>` — borrar varios IDs a la vez (coma-separados).
-- `--all-except <ids>` — borrar *todo* excepto los IDs listados.
-- `--dry-run` — ver qué se borraría sin tocar nada.
-
-**Ejemplos:**
-```bash
-ml delete pipeline mx-abc123
-ml delete pipeline --records mx-abc123,mx-def456
-ml delete pipeline --all-except mx-abc123
-ml delete pipeline --records mx-abc123 --dry-run
-```
-
-> **Nota**: no existe un comando `ml` para borrar un dominio completo. Para eliminarlo, borra el archivo `.mulch/expertise/<domain>.jsonl` y, si usas un config fijo, quita el dominio de `.mulch/mulch.config.yaml`.
-
-### `ml outcome <domain> <id>` (registrar resultado)
-**Qué hace:** anexa un resultado (success/failure/partial) a un registro existente para indicar si aplicar ese conocimiento tuvo efecto.
-
-**Uso básico:**
-```bash
-ml outcome <domain> <id> --status <success|failure|partial> --notes "<comentario>"
-```
-
-**Ejemplo:**
-```bash
-ml outcome pipeline mx-abc123 --status success --notes "Mejoró la estabilidad del cron job"
-```
-
-## ✅ Consejos clave para no generar ruido
-
-### ✨ Cuando sí grabar
-- Decisiones de diseño (p.ej. “por qué usamos runPipelineParallel”).
-- Patrones reutilizables (p.ej. “cómo se construye la pipeline de basket”).
-- Fallos recurrentes y su solución.
-- Referencias de archivos clave (p.ej. “dónde está la lógica del endpoint Uber”).
-
-### 🚫 Cuando NO grabar
-- Cambios pequeños/estéticos sin valor de aprendizaje.
-- Comentarios personales o TODOs.
-- Bugs sin resolución clara (mejor issue/beta testing).
-- Grabaciones que sólo repiten documentación existente sin aportar contexto nuevo.
-
-## 📎 Cómo vincular archivos a dominios (para que `ml learn` sugiera dominios)
-
-`ml learn` solo sugiere un dominio si existe al menos un registro en ese dominio con `--files` que coincida con el archivo cambiado.
-
-Ejemplo habitual:
-
-```bash
-ml record basket --type reference --name "Estructura del módulo basket" \
-  --description "Archivos principales del módulo basket y dónde está la lógica de cálculo" \
-  --files "src/modules/basket/**"
-```
-
-Después de esto, si cambias cualquier archivo bajo `src/modules/basket/`, `ml learn` sugerirá automáticamente el dominio `basket`.
-
-## 🧩 Checklist rápida (ideal para PRs)
-
-- [ ] Ejecuté `ml learn` y revisé los archivos detectados.
-- [ ] Registré (o decidí no registrar) conocimientos relevantes con `ml record`.
-- [ ] Confirmé que `.mulch/` no contiene errores con `ml validate`.
-- [ ] Hice `ml sync` si cambié `.mulch/`.
-
+Si hay duda de dominio:
+1) intenta mapear al proyecto real,
+2) si no es posible, usa `general`,
+3) documenta en `description` por qué fue transversal.

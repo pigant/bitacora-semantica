@@ -1,0 +1,432 @@
+[2026-03-31T17:24:43.132Z] mulch_found: true
+[2026-03-31T17:24:43.132Z] keywords: ["kiosco", "instalacion", "los", "pinpad", "que", "llegaron", "ayer", "fuero"]
+[2026-03-31T17:24:43.132Z] local_matches: [
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 85,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 142,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 148,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "        // close stdin to signal end"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 43,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/main.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                Err(\"Date must be YYYY-MM-DD or textual (hoy/ayer/antes de ayer/la semana pasada/el mes pasado/hace N dias)\".into())"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 274,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/main.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                                    // use suggestion_req_id as a temporary request id for rationale inference"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 345,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/main.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                    dom, desc, \"KIOSCO & OPERACIONES summary omitted for brevity\""
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 6,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/date_parse.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "/// - textual Spanish shortcuts: \"hoy\", \"ayer\", \"antes de ayer\", \"la semana pasada\", \"el mes pasado\""
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 21,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/date_parse.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "        \"ayer\" => Some(Local::now().date_naive() - Duration::days(1)),"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 22,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/date_parse.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "        \"antes de ayer\" => Some(Local::now().date_naive() - Duration::days(2)),"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 104,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/tests/pi_rpc_ping_test.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    // wait 3 seconds before sending prompt (as requested)"
+[2026-03-31T17:24:43.132Z]   }
+[2026-03-31T17:24:43.132Z] ]
+[2026-03-31T17:24:43.132Z] mulch_found: true
+[2026-03-31T17:24:43.132Z] keywords: ["kiosco", "instalacion", "kioscos", "cenco", "florida", "los", "pinpad", "que"]
+[2026-03-31T17:24:43.132Z] local_matches: [
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 94,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 146,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            prime_output = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 149,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                prime_output = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 156,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 179,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 291,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 393,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 274,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/main.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                                    // use suggestion_req_id as a temporary request id for rationale inference"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 345,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/main.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                    dom, desc, \"KIOSCO & OPERACIONES summary omitted for brevity\""
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 104,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/tests/pi_rpc_ping_test.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    // wait 3 seconds before sending prompt (as requested)"
+[2026-03-31T17:24:43.132Z]   }
+[2026-03-31T17:24:43.132Z] ]
+[2026-03-31T17:24:43.132Z] mulch_found: true
+[2026-03-31T17:24:43.132Z] keywords: ["kiosco", "instalacion", "cenco", "florida", "los", "pinpads", "llegados", "recepcionados"]
+[2026-03-31T17:24:43.132Z] local_matches: [
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 95,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 146,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 148,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 154,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 392,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 445,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 447,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 454,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 462,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "            query_output = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.132Z]   },
+[2026-03-31T17:24:43.132Z]   {
+[2026-03-31T17:24:43.132Z]     "lineno": 464,
+[2026-03-31T17:24:43.132Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.132Z]     "snippet": "                query_output = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.132Z]   }
+[2026-03-31T17:24:43.133Z] ]
+[2026-03-31T17:24:43.133Z] mulch_found: true
+[2026-03-31T17:24:43.133Z] keywords: ["kiosco", "instalacion", "cenco", "florida", "instalan", "los", "pinpad", "que"]
+[2026-03-31T17:24:43.133Z] local_matches: [
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 95,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 146,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 148,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 154,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 178,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 290,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 392,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 445,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 447,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 454,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.133Z]   }
+[2026-03-31T17:24:43.133Z] ]
+[2026-03-31T17:24:43.133Z] mulch_found: true
+[2026-03-31T17:24:43.133Z] keywords: ["kiosco", "instalacion", "los", "pinpad", "que", "llegaron", "ayer", "instalaron"]
+[2026-03-31T17:24:43.133Z] local_matches: [
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 95,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 146,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 148,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 154,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 178,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 290,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 392,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 445,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 447,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 454,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.133Z]   }
+[2026-03-31T17:24:43.133Z] ]
+[2026-03-31T17:24:43.133Z] mulch_found: true
+[2026-03-31T17:24:43.133Z] keywords: ["kiosco", "instalacion", "los", "pinpad", "que", "llegaron", "ayer", "instalaron"]
+[2026-03-31T17:24:43.133Z] local_matches: [
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 95,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 146,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 148,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 154,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 178,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 290,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 392,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 445,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 447,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 454,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.133Z]   }
+[2026-03-31T17:24:43.133Z] ]
+[2026-03-31T17:24:43.133Z] mulch_found: true
+[2026-03-31T17:24:43.133Z] keywords: ["kiosco", "instalacion", "cenco", "florida", "los", "pinpad", "que", "llegaron"]
+[2026-03-31T17:24:43.133Z] local_matches: [
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 95,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 146,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 148,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 154,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 178,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.133Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.133Z]   },
+[2026-03-31T17:24:43.133Z]   {
+[2026-03-31T17:24:43.133Z]     "lineno": 290,
+[2026-03-31T17:24:43.133Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 392,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 445,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 447,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 454,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.134Z]   }
+[2026-03-31T17:24:43.134Z] ]
+[2026-03-31T17:24:43.134Z] mulch_found: true
+[2026-03-31T17:24:43.134Z] keywords: ["kiosco", "instalacion", "cenco", "florida", "los", "pinpad", "que", "llegaron"]
+[2026-03-31T17:24:43.134Z] local_matches: [
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 95,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                                \"path\": path.to_string_lossy().to_string(),"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 146,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 148,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 154,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "    // remove the session-close protocol section if present"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 178,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "    prompt_full.push_str(\"\\nReglas: Si no encuentras registros en Mulch, realiza una búsqueda directa en el árbol del repo. Devuelve SOLO un JSON válido con las claves: text, ids, sources, confiden..."
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 290,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                \"Por favor, convierte la respuesta anterior exactamente a un JSON válido con las claves: text, ids, sources, confidence, rationale_notes, actions, metadata, error. Si no encontraste i..."
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 392,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "            // if we couldn't send followup (stdin closed) or no useful reply, fallback to wrapping original collected"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 445,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "            let mut s = String::from_utf8_lossy(&out.stdout).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 447,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "                s = String::from_utf8_lossy(&out.stderr).to_string();"
+[2026-03-31T17:24:43.134Z]   },
+[2026-03-31T17:24:43.134Z]   {
+[2026-03-31T17:24:43.134Z]     "lineno": 454,
+[2026-03-31T17:24:43.134Z]     "path": "/mnt/disk/trabajo/cencosud/bitacora/ui/src/inference.rs",
+[2026-03-31T17:24:43.134Z]     "snippet": "    if let Some(idx) = prime_output.find(\"# 🚨 SESSION CLOSE PROTOCOL 🚨\") {"
+[2026-03-31T17:24:43.134Z]   }
+[2026-03-31T17:24:43.134Z] ]

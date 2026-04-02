@@ -1,0 +1,9 @@
+{
+  "@context": "./context.jsonld",
+  "domain": "payments",
+  "id": "urn:log:payments:92a692b1-4c7e-4021-af11-22c646642141",
+  "rationale": "Se requiere cola y el recurso ya existe",
+  "recorded_at": "2026-03-31T23:12:49.331288840+00:00",
+  "title": "Adoptar Rabbitmq",
+  "type": "Decision"
+}

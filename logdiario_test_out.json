@@ -1,0 +1,46 @@
+[
+  {
+    "date": "2026-03-26",
+    "domain": "sai",
+    "title": "Problema con cruce de garantías",
+    "description": "Maria Nicole notificó a Paolo Castillo sobre un problema en el cruce de garantías desde el reporte de Cesar Follert, donde garantías por robo se cambian a normales. Paolo revisará la situación.",
+    "participants": "Maria Nicole, Paolo Castillo",
+    "files": "",
+    "type": "incident",
+    "ml_command": "ml record sai --type incident --name \"Problema con cruce de garantías\" --description \"Maria Nicole notificó a Paolo Castillo sobre un problema en el cruce de garantías desde el reporte de Cesar Follert, donde garantías por robo se cambian a normales. Paolo revisará la situación.\" --files \"\"",
+    "related": []
+  },
+  {
+    "date": "2026-03-26",
+    "domain": "general",
+    "title": "Evaluación de desempeño de WITI",
+    "description": "Reunión con Marcia Luengo de WITI para evaluar el desempeño de todos los integrantes WITI del equipo.",
+    "participants": "Marcia Luengo",
+    "files": "",
+    "type": "meeting",
+    "ml_command": "ml record general --type meeting --name \"Evaluación de desempeño de WITI\" --description \"Reunión con Marcia Luengo de WITI para evaluar el desempeño de todos los integrantes WITI del equipo.\" --files \"\"",
+    "related": []
+  },
+  {
+    "date": "2026-03-26",
+    "domain": "pos-movil",
+    "title": "Revisión de avances en pos móvil",
+    "description": "Reunión con Roberto Valenzuela, Silvana Vitali y Patricio Villarroel para revisar avances en pos móvil. Se identificaron mejoras necesarias: mostrar garantías en el historial de órdenes y en el control panel.",
+    "participants": "Roberto Valenzuela, Silvana Vitali, Patricio Villarroel",
+    "files": "",
+    "type": "decision",
+    "ml_command": "ml record pos-movil --type decision --name \"Revisión de avances en pos móvil\" --description \"Reunión con Roberto Valenzuela, Silvana Vitali y Patricio Villarroel para revisar avances en pos móvil. Se identificaron mejoras necesarias: mostrar garantías en el historial de órdenes y en el control panel.\" --files \"\"",
+    "related": []
+  },
+  {
+    "date": "2026-03-26",
+    "domain": "pos-movil",
+    "title": "Problema en Sales Orders con GraphQL de staging",
+    "description": "Durante la reunión de pos móvil, se detectó un problema en Sales Orders relacionado con GraphQL de staging, que impide mostrar órdenes con garantías. Se entregó la información al equipo correspondiente para su reparación.",
+    "participants": "Roberto Valenzuela, Silvana Vitali, Patricio Villarroel",
+    "files": "",
+    "type": "failure",
+    "ml_command": "ml record pos-movil --type failure --name \"Problema en Sales Orders con GraphQL de staging\" --description \"Durante la reunión de pos móvil, se detectó un problema en Sales Orders relacionado con GraphQL de staging, que impide mostrar órdenes con garantías. Se entregó la información al equipo correspondiente para su reparación.\" --files \"\"",
+    "related": []
+  }
+]

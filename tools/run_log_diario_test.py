@@ -115,7 +115,7 @@ def main():
     p.add_argument('--out', '-o', type=Path, default=Path('logdiario_test_out.json'), help='Where to write parsed JSON array')
     p.add_argument('--related', '-r', default='', help='RELATED_HINTS string (optional)')
     p.add_argument('--date', '-d', default='2026-03-26', help='Reference date to include in prompt (optional)')
-    p.add_argument('--raw-out', default='/tmp/logdiario_raw.out', help='Save raw process output')
+    p.add_argument('--raw-out', default='logs/logdiario_raw.out', help='Save raw process output')
     p.add_argument('--with-prime', action='store_true', help='Run ml prime and include minimal output in prompt')
     p.add_argument('--with-status', action='store_true', help='Run ml status and include minimal output in prompt')
     p.add_argument('--prime-out-file', default='', help='Save raw ml prime output to file')
@@ -158,7 +158,8 @@ def main():
     print('Invoking pi CLI...')
     stdout, stderr, code = run_pi_with_prompt(prompt)
 
-    # save raw outputs
+    # save raw outputs (ensure logs dir exists)
+    Path(args.raw_out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.raw_out).write_text(stdout + '\n\n=== STDERR ===\n\n' + stderr, encoding='utf-8')
 
     if code != 0:
