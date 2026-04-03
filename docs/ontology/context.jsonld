@@ -1,0 +1,53 @@
+{
+  "@context": {
+    "@vocab": "https://pigant.github.io/bitacora-semantica/ontology/",
+    "id": "@id",
+    "type": "@type",
+
+    "Record": "https://pigant.github.io/bitacora-semantica/ontology/Record",
+    "Decision": "https://pigant.github.io/bitacora-semantica/ontology/Decision",
+    "Fact": "https://pigant.github.io/bitacora-semantica/ontology/Fact",
+    "Assumption": "https://pigant.github.io/bitacora-semantica/ontology/Assumption",
+    "Meeting": "https://pigant.github.io/bitacora-semantica/ontology/Meeting",
+    "Action": "https://pigant.github.io/bitacora-semantica/ontology/Action",
+    "Person": "https://schema.org/Person",
+
+    "title": "https://schema.org/name",
+    "name": "https://schema.org/name",
+    "description": "https://schema.org/description",
+    "rationale": "https://pigant.github.io/bitacora-semantica/ontology/rationale",
+    "recorded_at": "https://schema.org/dateCreated",
+    "date": "https://schema.org/startDate",
+    "effective_from": "https://pigant.github.io/bitacora-semantica/ontology/effectiveFrom",
+    "domain": "https://schema.org/areaServed",
+    "tags": "https://schema.org/keywords",
+    "classification": "https://pigant.github.io/bitacora-semantica/ontology/classification",
+
+    "author": { "@id": "https://schema.org/author", "@type": "@id" },
+    "participants": { "@id": "https://schema.org/attendee", "@type": "@id" },
+    "assigned_to": { "@id": "https://schema.org/assignee", "@type": "@id" },
+
+    "evidence": "https://pigant.github.io/bitacora-semantica/ontology/evidence",
+    "evidenceType": "https://pigant.github.io/bitacora-semantica/ontology/evidenceType",
+    "reference": "https://pigant.github.io/bitacora-semantica/ontology/reference",
+
+    "outcomes": "https://pigant.github.io/bitacora-semantica/ontology/outcomes",
+    "status": "https://schema.org/ActionStatus",
+    "confidence": "https://pigant.github.io/bitacora-semantica/ontology/confidence",
+    "impact": "https://pigant.github.io/bitacora-semantica/ontology/impact",
+
+    "links": "https://pigant.github.io/bitacora-semantica/ontology/links",
+    "relation": "https://pigant.github.io/bitacora-semantica/ontology/relation",
+    "target": { "@id": "https://pigant.github.io/bitacora-semantica/ontology/target", "@type": "@id" },
+    "strength": "https://pigant.github.io/bitacora-semantica/ontology/strength",
+    "rationaleNote": "https://pigant.github.io/bitacora-semantica/ontology/rationaleNote",
+
+    "related_files": "https://pigant.github.io/bitacora-semantica/ontology/relatedFiles",
+    "provenance": "https://pigant.github.io/bitacora-semantica/ontology/provenance",
+
+    "options_considered": "https://pigant.github.io/bitacora-semantica/ontology/optionsConsidered",
+    "chosen_option": "https://pigant.github.io/bitacora-semantica/ontology/chosenOption",
+
+    "@protected": false
+  }
+}
