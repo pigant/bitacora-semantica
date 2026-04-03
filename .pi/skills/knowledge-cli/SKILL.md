@@ -5,6 +5,15 @@ description: "Skill para operar knowledge-cli: crear, vincular, consultar y vali
 
 # Skill: knowledge-cli
 
+## Dominio (Ontología)
+Esta skill separa claramente tres responsabilidades: (1) Dominio/ontología, (2) Operaciones/CLI y (3) Restricciones/reglas. La definición completa de entidades y propiedades está en ONTOLOGY.md (Bitácora Semántica). Resumen rápido de entidades y relaciones relevantes:
+
+- Entidades principales: Record (base), Decision, Fact, Assumption, Meeting, Action, Person, Evidence, Outcome, Link.
+- Relaciones frecuentes: relatesTo, supersedes, dependsOn, recordedInMeeting, derivedFrom, confirms, contradicts, actionFor, assignedTo.
+- Identificadores: usar URNs con prefijo `urn:bitacora:<domain>:<id>`.
+
+Cuándo incluir ontología en la skill: si el LLM no domina el dominio (cobertura ❌/±), incluir vocabulario y reglas clave aquí; si la cobertura es alta (❌→✓), bastan los ejemplos y operaciones.
+
 ## Proposito
 Esta skill define como usar `knowledge-cli` de forma consistente para:
 - crear registros atomicos por dominio,
@@ -30,7 +39,7 @@ Invocar esta skill cuando necesites:
 - Un registro = un archivo JSON-LD.
 - El indice vive en `knowledge/index.json`.
 - Los links se guardan en el registro origen (`from`).
-- Usar ids estables tipo `urn:log:<domain>:<uuid>`.
+- Usar ids estables tipo `urn:bitacora:<domain>:<uuid>`.
 - Preferir `--domain` explicito para facilitar filtrado.
 
 ## Create: variantes y requeridos
@@ -134,8 +143,8 @@ Requeridos:
 Ejemplo:
 ```bash
 knowledge-cli link \
-  --from urn:log:payments:AAA \
-  --to urn:log:payments:BBB \
+  --from urn:bitacora:payments:AAA \
+  --to urn:bitacora:payments:BBB \
   --relation relatesTo
 ```
 
@@ -253,6 +262,31 @@ knowledge-cli --skill payments
 - `create action --status invalid` (usar estados permitidos).
 - `create meeting --date 31-03-2026` (usar `YYYY-MM-DD` o RFC3339).
 - `link --relation causes` si la relacion no esta en el set permitido.
+
+## DSL y FSM
+
+### DSL (CLI) como capa de expresión
+El CLI de `knowledge-cli` actúa como un DSL externo: los comandos y flags son la sintaxis para expresar operaciones del dominio. Recomendaciones:
+- Verbos como subcomandos (`create`, `link`, `validate`) y sustantivos como argumentos posicionales o `--id`.
+- Validar inputs en dos capas: parsing (CLI) y semántica (validator/FSM).
+- Documentar ejemplos repetibles que sirvan tanto a humanos como a pruebas automatizadas.
+
+### FSM (validación de estado y transiciones)
+Algunas operaciones requieren validar transiciones (por ejemplo, no enlazar a un id inexistente, no marcar un action como `done` si no tiene outcome). Sugerencias:
+- Implementar una FSM ligera para validaciones críticas (create -> validate -> link).
+- Las reglas de la ontología (cardinalidad, enums) se ejecutan en el validador; la FSM aplica restricciones de transición y estado.
+- Exponer mensajes de error claros y acciones de recuperación (por ejemplo, "Falta evidencia: ejecutar validate --file <file>").
+
+## Cobertura recomendada para skills
+
+Usa la grilla de cobertura para decidir cuánto dominio proporcionar en la skill (útil cuando la skill se usa desde LLMs o prompts asistidos):
+
+- Capa 1 — Vocabulario: nombres de entidades clave (Decision, Fact, Action).
+- Capa 2 — Relaciones: cómo se conectan entidades (relatesTo, dependsOn).
+- Capa 3 — Restricciones: enums, formatos, cardinalidad.
+- Capa 4 — Casos borde: ejemplos concretos y respuestas esperadas.
+
+Regla práctica: si la cobertura de la capa es ✓ en LLM externo, puedes omitirla de la skill; si es ±/✗, inclúyela.
 
 ## Checklist de cierre tecnico
 Cuando se hagan cambios al codigo de `knowledge-cli`, cerrar con:
