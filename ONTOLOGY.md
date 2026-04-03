@@ -1,14 +1,18 @@
-# PROPUESTA: Ontología para "Log Diario"
+# PROPUESTA: Ontología para "Bitácora Semántica"
 
 ## Resumen
 
-Objetivo: diseñar una ontología práctica para representar un "log diario" de trabajo técnico (decisiones, hechos, suposiciones, reuniones, acciones), enlazar registros entre sí y facilitar búsqueda, auditoría y trazabilidad.
+Objetivo: diseñar una ontología práctica para representar una "Bitácora Semántica" de trabajo técnico (decisiones, hechos, suposiciones, reuniones, acciones), enlazar registros entre sí y facilitar búsqueda, auditoría y trazabilidad.
+
+Nota sobre el término "Bitácora Semántica"
+------------------------------------------
+Se reemplaza la expresión "Log Diario" por "Bitácora Semántica" para enfatizar dos ideas clave: (1) "bitácora" comunica claramente que se trata de registros de trabajo o entradas cronológicas del proyecto, y (2) "semántica" indica que los registros contienen metadatos estructurados y enlaces (ontología) que permiten consultas y automatización. En el diseño recomendamos usar URNs con prefijo `urn:bitacora:` (por ejemplo `urn:bitacora:payments:dec-2026-0001`) como identificadores estables; si existen registros previos con `urn:log:...`, documentar un mapeo o migración.
 
 ## Principios de diseño
 
 - Modelo en forma de grafo dirigido con nodos tipados (Decision, Fact, Meeting, Action, Person, etc.) y relaciones tipadas (relatesTo, supersedes, dependsOn).
 - Formato primario: JSON-LD por registro (un fichero = un registro). Alternativa: JSONL por dominio si se prefiere simplicidad.
-- Identificadores estables: URN local del estilo urn:log:<dominio>:<id> o UUIDs reproducibles.
+- Identificadores estables: URN local del estilo urn:bitacora:<dominio>:<id> o UUIDs reproducibles. (Se recomienda `urn:bitacora:` para nuevos registros.)
 - Diseñar para independencia de cualquier herramienta específica; priorizar interoperabilidad, claridad y validación con esquema.
 
 ## Ontología: clases principales (aclaradas)
@@ -44,7 +48,7 @@ Convenciones rápidas
 Mini-ejemplo (genérico):
 {
   "@context":"./context.jsonld",
-  "id":"urn:log:proj:123",
+  "id":"urn:bitacora:proj:123",
   "type":"Record",
   "recorded_at":"2026-03-31T10:00:00Z",
   "title":"Registro genérico"
@@ -69,7 +73,7 @@ Mini-ejemplo (genérico):
 Ejemplo mínimo:
 {
   "@context":"./context.jsonld",
-  "id":"urn:log:proj:dec-001",
+  "id":"urn:bitacora:proj:dec-001",
   "type":"Decision",
   "title":"Adoptar Postgres",
   "rationale":"Necesitamos ACID para conciliación",
@@ -89,7 +93,7 @@ Ejemplo mínimo:
 
 Ejemplo:
 {
-  "id":"urn:log:proj:fact-007",
+  "id":"urn:bitacora:proj:fact-007",
   "type":"Fact",
   "observation":"La cola X se saturó el 2026-03-28",
   "recorded_at":"2026-03-28T18:00:00Z",
@@ -110,7 +114,7 @@ Ejemplo:
 
 Ejemplo:
 {
-  "id":"urn:log:proj:assump-01",
+  "id":"urn:bitacora:proj:assump-01",
   "type":"Assumption",
   "assumption_statement":"El tráfico mensual no excederá 500k reqs",
   "recorded_at":"2026-03-01T09:00:00Z"
@@ -133,7 +137,7 @@ Ejemplo:
 
 Ejemplo:
 {
-  "id":"urn:log:proj:meet-2026-03-28",
+  "id":"urn:bitacora:proj:meet-2026-03-28",
   "type":"Meeting",
   "title":"Arquitectura pagos",
   "date":"2026-03-28T10:00:00Z",
@@ -156,7 +160,7 @@ Ejemplo:
 
 Ejemplo:
 {
-  "id":"urn:log:proj:act-001",
+  "id":"urn:bitacora:proj:act-001",
   "type":"Action",
   "title":"PoC Postgres",
   "assigned_to":"mailto:dev1@org",
@@ -215,7 +219,7 @@ Ejemplo:
   - recorded_at: date (0..1)
 
 Ejemplo:
-{"relation":"supersedes","target":"urn:log:proj:dec-000-old","rationale":"Actualiza política X","strength":0.8}
+{"relation":"supersedes","target":"urn:bitacora:proj:dec-000-old","rationale":"Actualiza política X","strength":0.8}
 
 Relaciones y cardinalidad ejemplos (diagrama pequeño unicode)
 - Decision con acciones y reunión:
@@ -305,7 +309,7 @@ Decision
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:payments:mx-6f2a1b",
+  "id": "urn:bitacora:payments:mx-6f2a1b",
   "type": "Decision",
   "title": "Usar PostgreSQL para pagos",
   "description": "Elegimos Postgres por estabilidad y soporte de transacciones distribuidas.",
@@ -316,8 +320,8 @@ Decision
   "tags": ["database","arch-decision"],
   "recorded_at": "2026-03-30T15:12:00Z",
   "author": "mailto:yo@empresa.com",
-  "relatesTo": ["urn:log:payments:mx-a1b2c3"],
-  "supersedes": ["urn:log:payments:mx-old123"],
+  "relatesTo": ["urn:bitacora:payments:mx-a1b2c3"],
+  "supersedes": ["urn:bitacora:payments:mx-old123"],
   "evidence": [{"type":"commit","reference":"a1b2c3d","date":"2026-03-29"}],
   "status": "accepted",
   "confidence": 0.9,
@@ -329,15 +333,15 @@ Meeting con acciones
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:payments:mx-meet-2026-03-28",
+  "id": "urn:bitacora:payments:mx-meet-2026-03-28",
   "type": "Meeting",
   "title": "Reunión Arquitectura Pagos",
   "date": "2026-03-28T10:00:00Z",
   "participants": ["mailto:yo@empresa.com","mailto:dev1@empresa.com"],
   "minutes": "Se discutió la migración a Postgres; acordamos crear PoC y timeline.",
-  "decisions_made": ["urn:log:payments:mx-6f2a1b"],
+  "decisions_made": ["urn:bitacora:payments:mx-6f2a1b"],
   "actions": [
-    {"id":"urn:log:payments:mx-act-001","title":"PoC Postgres","assigned_to":"mailto:dev1@empresa.com","due_date":"2026-04-07","status":"in-progress"}
+    {"id":"urn:bitacora:payments:mx-act-001","title":"PoC Postgres","assigned_to":"mailto:dev1@empresa.com","due_date":"2026-04-07","status":"in-progress"}
   ]
 }
 ```
@@ -348,7 +352,7 @@ Fact (detallado)
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:fact-042",
+  "id": "urn:bitacora:proj:fact-042",
   "type": "Fact",
   "observation": "Pico de CPU en servicio checkout a 92% durante el despliegue del 2026-03-25",
   "recorded_at": "2026-03-25T14:37:00Z",
@@ -366,7 +370,7 @@ Fact (detallado)
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:assump-02",
+  "id": "urn:bitacora:proj:assump-02",
   "type": "Assumption",
   "assumption_statement": "Las consultas más costosas se ejecutan menos de 10 veces por minuto",
   "recorded_at": "2026-03-20T09:10:00Z",
@@ -376,7 +380,7 @@ Fact (detallado)
 
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:act-test-001",
+  "id": "urn:bitacora:proj:act-test-001",
   "type": "Action",
   "title": "Crear PoC test de carga /search",
   "assigned_to": "mailto:perf@org",
@@ -387,7 +391,7 @@ Fact (detallado)
 
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:fact-043",
+  "id": "urn:bitacora:proj:fact-043",
   "type": "Fact",
   "observation": "El endpoint /search alcanzó 120 consultas/min durante el test de carga",
   "recorded_at": "2026-03-27T11:05:00Z",
@@ -397,12 +401,12 @@ Fact (detallado)
 
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:outcome-001",
+  "id": "urn:bitacora:proj:outcome-001",
   "type": "Record",
   "recorded_at": "2026-03-28T09:00:00Z",
   "title": "Resultado validación suposición /search",
   "outcomes": [{"status":"failure","notes":"La suposición es falsa: tráfico mayor al estimado","recorded_at":"2026-03-27T12:00:00Z"}],
-  "links": [{"relation":"confirms","target":"urn:log:proj:fact-043","rationale":"Test demuestra comportamiento real"}, {"relation":"contradicts","target":"urn:log:proj:assump-02","rationale":"Asunción invalidada por test"}]
+  "links": [{"relation":"confirms","target":"urn:bitacora:proj:fact-043","rationale":"Test demuestra comportamiento real"}, {"relation":"contradicts","target":"urn:bitacora:proj:assump-02","rationale":"Asunción invalidada por test"}]
 }
 ```
 
@@ -411,24 +415,24 @@ Fact (detallado)
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:act-002",
+  "id": "urn:bitacora:proj:act-002",
   "type": "Action",
   "title": "Optimizar consulta /search",
   "assigned_to": "mailto:dev-search@org",
   "due_date": "2026-04-20",
   "status": "in-progress",
   "tags": ["perf","backend"],
-  "links": [{"relation":"derivedFrom","target":"urn:log:proj:fact-043","rationale":"Root cause from perf test"}]
+  "links": [{"relation":"derivedFrom","target":"urn:bitacora:proj:fact-043","rationale":"Root cause from perf test"}]
 }
 
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:outcome-002",
+  "id": "urn:bitacora:proj:outcome-002",
   "type": "Record",
   "recorded_at": "2026-05-01T10:00:00Z",
   "title": "Optimización /search implementada",
   "outcomes": [{"status":"success","notes":"Reducción 40% en p95","recorded_at":"2026-05-01T09:50:00Z","agent":"mailto:dev-search@org"}],
-  "links": [{"relation":"confirms","target":"urn:log:proj:act-002","rationale":"Resultado del trabajo"}]
+  "links": [{"relation":"confirms","target":"urn:bitacora:proj:act-002","rationale":"Resultado del trabajo"}]
 }
 ```
 
@@ -436,13 +440,13 @@ Ejemplo de uso de Link con metadata
 ```
 {
   "@context": "./context.jsonld",
-  "id": "urn:log:proj:dec-umbrella-01",
+  "id": "urn:bitacora:proj:dec-umbrella-01",
   "type": "Decision",
   "title": "Política de cache para resultados de búsqueda",
   "rationale": "Reducir carga en DB y mejorar latencia",
   "recorded_at": "2026-03-29T08:00:00Z",
   "links": [
-    {"relation":"dependsOn","target":"urn:log:proj:act-002","rationale":"Depende de optimización de consultas","strength":0.9},
+    {"relation":"dependsOn","target":"urn:bitacora:proj:act-002","rationale":"Depende de optimización de consultas","strength":0.9},
     {"relation":"references","target":"https://docs.internal/cache-policy","rationale":"Documento de referencia"}
   ]
 }
@@ -450,7 +454,7 @@ Ejemplo de uso de Link con metadata
 
 Mini-grafo (ascii) que muestra flujo Assumption -> Test -> Fact -> Action -> Outcome
 
-Assumption A (urn:log:proj:assump-02)
+Assumption A (urn:bitacora:proj:assump-02)
   └─ triggers -> Action act-test-001
             └─ produces -> Fact fact-043
                       └─ spawns -> Action act-002
@@ -526,13 +530,13 @@ Notas:
 
 ## Ejemplo ASCII de vínculo entre objetos
 
-  urn:log:payments:mx-meet-2026-03-28
-  ├─ decisions_made -> urn:log:payments:mx-6f2a1b
-  └─ actions -> urn:log:payments:mx-act-001
+  urn:bitacora:payments:mx-meet-2026-03-28
+  ├─ decisions_made -> urn:bitacora:payments:mx-6f2a1b
+  └─ actions -> urn:bitacora:payments:mx-act-001
 
-  urn:log:payments:mx-6f2a1b
-  ├─ supersedes -> urn:log:payments:mx-old123
-  └─ relatesTo -> urn:log:infra:mx-db-pattern
+  urn:bitacora:payments:mx-6f2a1b
+  ├─ supersedes -> urn:bitacora:payments:mx-old123
+  └─ relatesTo -> urn:bitacora:infra:mx-db-pattern
 
 ## Siguientes pasos sugeridos
 

@@ -103,7 +103,7 @@ Validación y esquema (integrado)
 
 Autogeneración de ID y versionado
 ---------------------------------
-- ID por defecto: urn:log:<domain>:<uuid-v4>. El usuario puede reemplazar en modo avanzado; por diseño ID es inmutable tras primer guardado; ediciones generan updated_at y version increment.
+- ID por defecto: urn:bitacora:<domain>:<uuid-v4>. El usuario puede reemplazar en modo avanzado; por diseño ID es inmutable tras primer guardado; ediciones generan updated_at y version increment.
 - Esta política aplica la heurística 3 (control y libertad) y 5 (prevención de errores en identificación).
 
 Persistencia (segura y visible)
@@ -183,7 +183,7 @@ Ejemplos integrados (UI -> JSON-LD + heurística aplicable)
 Ejemplo (preview JSON-LD):
 {
   "@context":"./context.jsonld",
-  "id":"urn:log:payments:dec-2026-0001",
+  "id":"urn:bitacora:payments:dec-2026-0001",
   "type":"Decision",
   "title":"Adoptar Postgres",
   "rationale":"Necesitamos ACID para conciliación",
