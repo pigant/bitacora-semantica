@@ -1,7 +1,7 @@
 RESUMEN
 
 Propósito
-- Interfaz de terminal (TUI) para capturar "Log Diario" y producir una propuesta de comando ejecutable de Mulch (comando `ml record`) a partir de los datos ingresados por el usuario.
+- Interfaz de terminal (TUI) para capturar la "Bitácora Semántica" y producir una propuesta de comando ejecutable a partir de los datos ingresados por el usuario.
 
 Audiencia
 - Operadores o desarrolladores que mantengan una base de conocimiento Mulch y quieran convertir notas/observaciones en registros formales mediante un flujo asistido.
