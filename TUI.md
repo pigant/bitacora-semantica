@@ -1,4 +1,4 @@
-# TUI.md — Interfaz de Terminal (TUI) para el "Log Diario"
+# TUI.md — Interfaz de Terminal (TUI) para la "Bitácora Semántica"
 
 Propósito
 --------

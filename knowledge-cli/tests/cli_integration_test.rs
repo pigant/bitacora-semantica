@@ -670,7 +670,7 @@ fn validate_graph_fails_with_broken_reference() {
     value["links"] = serde_json::json!([
         {
             "relation": "relatesTo",
-            "target": "urn:log:payments:does-not-exist",
+            "target": "urn:bitacora:payments:does-not-exist",
             "recorded_at": "2026-03-31T00:00:00Z"
         }
     ]);
