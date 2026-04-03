@@ -1,2 +1,4 @@
 ui
 knowledge-cli/target
+# Ignore generated knowledge files (index + records)
+knowledge-cli/knowledge/

@@ -967,5 +967,5 @@ fn normalize_recorded_at(recorded_at: Option<&str>) -> Result<String> {
 }
 
 fn make_urn(domain: &str) -> String {
-    format!("urn:log:{}:{}", domain, Uuid::new_v4())
+    format!("urn:bitacora:{}:{}", domain, Uuid::new_v4())
 }
